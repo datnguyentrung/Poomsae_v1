@@ -1,0 +1,24 @@
+.sigmaBoxContainer {
+    padding: 5px;
+    border-radius: 10px;
+    background-color: var(--gray-50);
+    border: 2px solid var(--gray-300);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out; // hiệu ứng mượt
+
+    &:active {
+        background-color: var(--green-200);
+        border-color: var(--green-400);
+        transform: scale(0.98); // nhấn xuống một chút
+    }
+
+    &:hover {
+        background-color: var(--green-100);
+        border: 2px solid var(--green-300);
+    }
+}
+
+.sigmaBoxPlayerInfo {
+    display: flex;
+    gap: 5px;
+}
