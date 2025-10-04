@@ -28,3 +28,27 @@ export interface MatchCardProps {
     isFirstRound: boolean;
     onAdvanceWinner?: (winner: Player) => void;
 }
+
+export interface Node {
+    parentNodeId: number;
+    childNodeId: number;
+    levelNode: number;
+    bracketNodes: number[];
+    participants: number;
+}
+
+export interface PoomsaeHistory {
+    name?: string;
+    sourceNode?: number;
+    targetNode?: number;
+    levelNode?: number;
+    hasWon?: boolean;
+}
+
+export interface SigmaData {
+    childNode: number;
+    parentNode: number | null;
+    round: string;
+    match: number;
+    participants?: number;
+}

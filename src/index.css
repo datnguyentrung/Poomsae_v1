@@ -27,13 +27,49 @@ body {
   padding: 0;
   min-width: 320px;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: auto;
+  overflow-y: auto;
+  /* Ẩn thanh cuộn nhưng vẫn cho phép cuộn */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+/* Ẩn thanh cuộn cho Webkit browsers (Chrome, Safari, Edge) */
+body::-webkit-scrollbar {
+  display: none;
 }
 
 html {
   margin: 0;
   padding: 0;
+  /* Ẩn thanh cuộn cho html cũng */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: scroll; /* cho cuộn ngang */
+  overflow-y: scroll; /* cho cuộn dọc */
+
+  /* ẩn scrollbar với Firefox */
+  scrollbar-width: none;
+
+  /* ẩn scrollbar với IE, Edge cũ */
+  -ms-overflow-style: none;
+}
+
+/* ẩn scrollbar với Chrome, Safari, Edge mới */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
 
 h1 {
   font-size: 3.2em;
@@ -57,6 +93,17 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Global scrollbar hiding for all elements */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+/* Ẩn thanh cuộn cho tất cả Webkit browsers */
+*::-webkit-scrollbar {
+  display: none;
 }
 
 @media (prefers-color-scheme: light) {

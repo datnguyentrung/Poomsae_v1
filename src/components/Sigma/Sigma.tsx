@@ -1,146 +1,151 @@
-import './Sigma.scss'
-import SigmaBoxDouble from "./SigmaBoxDouble/SigmaBoxDouble"
-import type { Player, TournamentBracketProps } from '../../types/types';
+import './Sigma.scss';
+import NodeGroup from "./NodeGroup";
+import { getTournamentStructure, getTotalPlayersNeeded, getLabelForMatch } from "../../utils/NodeUtils";
+import type { Node as BracketNode, PoomsaeHistory } from '@/types/types';
+import { getBracketNodesByParticipants } from '@/services/BracketNode';
+import type { SigmaData } from '@/types/types';
+import { PoomsaeSigmaLocalStorage } from '@/utils/PoomsaeSigmaStorage';
+import React from 'react';
 
+export default function Sigma({ players, participants }: { players?: PoomsaeHistory[], participants?: number }) {
+    const [bracketNodes, setBracketNodes] = React.useState<BracketNode[]>([]);
+    const [loading, setLoading] = React.useState(false);
+    const [cachedParticipants, setCachedParticipants] = React.useState<number | null>(null);
 
-export default function Sigma({ playerCount, players, onPlayersChange }: TournamentBracketProps) {
-
-    const getTournamentStructure = () => {
-        const totalRounds = Math.ceil(Math.log2(playerCount));
-        const firstRoundMatches = Math.floor(playerCount / 2);
-
-        return {
-            totalRounds,
-            firstRoundMatches,
-            matchesPerRound: Array.from({ length: totalRounds },
-                (_, i) => Math.ceil(firstRoundMatches / Math.pow(2, i))
-            )
+    // Memoize structure calculation để tránh tính lại không cần thiết  
+    const structure = React.useMemo(() => {
+        if (bracketNodes.length > 0) {
+            const nodeStructure = getTournamentStructure(bracketNodes);
+            const matchCount = getTotalPlayersNeeded(participants || players?.length || 0);
+            // Convert to expected format
+            // console.log(nodeStructure);
+            return {
+                level: nodeStructure.map(n => n.level),
+                totalRounds: matchCount,
+                round: nodeStructure,
+            };
         }
-    }
+        return { level: [], totalRounds: 0, round: [] };
+    }, [bracketNodes, participants, players?.length]);
 
-    const structure = getTournamentStructure();
+    // console.log("Tournament Structure:", structure);
 
-    // Tạo mảng players đủ cho tất cả các rounds
-    const getTotalPlayersNeeded = () => {
-        let total = 0;
-        structure.matchesPerRound.forEach(matchCount => {
-            total += matchCount * 2;
+    // Function để tạo PoomsaeSigma data từ bracket structure
+    const createSigmaData = React.useCallback((bracketNodes: BracketNode[], currentParticipants: number): SigmaData[] => {
+        const sigmaData: SigmaData[] = [];
+        const nodeStructure = getTournamentStructure(bracketNodes);
+
+        // console.log("Node Structure for Sigma Data:", nodeStructure);
+
+        nodeStructure.forEach((levelData) => {
+            const roundIndex = nodeStructure.length - levelData.level; // Reverse để có đúng round order
+            const roundLabel = getLabelForMatch({ roundIndex, totalRounds: nodeStructure.length });
+
+            Object.entries(levelData.parents).forEach(([parentIdStr, children], matchIndex) => {
+                const parentId = parentIdStr === 'null' ? null : parseInt(parentIdStr);
+
+                // Tạo record cho mỗi child node
+                children.forEach(childId => {
+                    sigmaData.push({
+                        childNode: childId,
+                        parentNode: parentId,
+                        round: roundLabel,
+                        match: matchIndex + 1,
+                        participants: currentParticipants
+                    });
+                });
+            });
         });
-        return total;
-    };
 
-    // Khởi tạo mảng players đầy đủ nếu cần
-    const ensurePlayersArray = () => {
-        const totalNeeded = getTotalPlayersNeeded();
-        if (players.length < totalNeeded) {
-            const extendedPlayers = [...players];
-            // Thêm các placeholder players cho các rounds sau
-            for (let i = players.length; i < totalNeeded; i++) {
-                extendedPlayers.push({ id: i + 1, name: '' });
+        return sigmaData;
+    }, []);
+
+    React.useEffect(() => {
+        const fetchBracketNodes = async () => {
+            const currentParticipants = participants || players?.length || 0;
+
+            // Chỉ gọi API nếu:
+            // 1. Có participants/players
+            // 2. Chưa loading
+            // 3. Participants khác với cached value
+            if (currentParticipants > 0 && !loading && currentParticipants !== cachedParticipants) {
+                setLoading(true);
+                try {
+                    // console.log(`🔄 Fetching bracket nodes for ${currentParticipants} participants`);
+                    const data = await getBracketNodesByParticipants(currentParticipants);
+                    setBracketNodes(data);
+                    setCachedParticipants(currentParticipants);
+
+                    // Tạo và save PoomsaeSigma data vào localStorage
+                    const sigmaData = createSigmaData(data, currentParticipants);
+                    // console.log('PoomsaeSigma data to save:', sigmaData);
+
+                    // Lưu vào localStorage sử dụng utility class
+                    PoomsaeSigmaLocalStorage.save(currentParticipants, sigmaData);
+                } catch (error) {
+                    console.error("Error fetching bracket nodes:", error);
+                } finally {
+                    setLoading(false);
+                }
             }
-            onPlayersChange(extendedPlayers);
-            return extendedPlayers;
-        }
-        return players;
-    };
+        };
 
-    const handlePlayerNameChange = (index: number, name: string) => {
-        const currentPlayersArray = ensurePlayersArray();
-        const updatedPlayers = [...currentPlayersArray];
-        updatedPlayers[index] = { ...updatedPlayers[index], name };
-        onPlayersChange(updatedPlayers);
+        fetchBracketNodes();
+    }, [participants, players?.length, loading, cachedParticipants, createSigmaData])
+
+    if (loading) {
+        return (
+            <div className='sigma'>
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                    🔄 Đang tải bracket nodes...
+                </div>
+            </div>
+        );
     }
-
-    const advanceWinner = (roundIndex: number, matchIndex: number, winner: Player) => {
-        console.log(`Advancing winner: ${winner.name} from Round ${roundIndex + 1}, Match ${matchIndex + 1}`);
-
-        // Logic để đưa winner vào round tiếp theo
-        if (roundIndex < structure.totalRounds - 1) {
-            const currentPlayersArray = ensurePlayersArray();
-            const updatedPlayers = [...currentPlayersArray];
-
-            // Tính target index cho round tiếp theo
-            const nextRoundStartIndex = getStartIndexForRound(roundIndex + 1);
-            const targetIndex = nextRoundStartIndex + Math.floor(matchIndex / 2);
-
-            console.log('targetIndex:', targetIndex, 'nextRoundStartIndex:', nextRoundStartIndex, 'matchIndex:', matchIndex);
-
-            // Đảm bảo targetIndex hợp lệ
-            if (targetIndex < updatedPlayers.length) {
-                updatedPlayers[targetIndex] = winner;
-                onPlayersChange(updatedPlayers);
-                console.log('updated players: ', updatedPlayers);
-            } else {
-                console.warn(`targetIndex ${targetIndex} vượt quá chiều dài players (${updatedPlayers.length})`);
-            }
-        }
-    }
-
-    // Helper function để tính start index cho mỗi round
-    const getStartIndexForRound = (roundIndex: number) => {
-        let startIndex = 0;
-        for (let i = 0; i < roundIndex; i++) {
-            startIndex += structure.matchesPerRound[i] * 2;
-        }
-        return startIndex;
-    }
-
-    // console.log('Tournament Structure:', structure);
 
     return (
-        <div className="sigmaContainer">
-            <h1 className='sigmaTitle'>Tournament Bracket</h1>
-            <div className='sigmaBracket'>
-                {structure.matchesPerRound.map((matchCount, roundIndex) => {
-                    const roundStart = getStartIndexForRound(roundIndex);
-                    return (
-                        <div key={roundIndex} className="sigmaRound">
-                            <div>
+        <div className='sigma'>
+            <div className='round-container'>
+                {structure.level
+                    .sort((a, b) => b - a)
+                    .map((round, roundIndex) => {
+                        if (round === 0) return null; // Skip the first round (level 0) if needed
+                        return (
+                            <div key={roundIndex} className='round-section'>
                                 <h3>
-                                    {roundIndex === structure.totalRounds - 1
-                                        ? 'Chung kết'
-                                        : roundIndex === structure.totalRounds - 2
-                                            ? 'Bán kết'
-                                            : roundIndex === structure.totalRounds - 3
-                                                ? 'Tứ kết'
-                                                : `Vòng ${roundIndex + 1}`}
+                                    {getLabelForMatch({ roundIndex, totalRounds: structure.totalRounds })}
                                 </h3>
+                                <div>
+                                    {structure.round && structure.round
+                                        .filter(s => s.level === round)
+                                        .map((roundData, roundDataIndex) =>
+                                            Object.entries(roundData.parents).map(([parentId, children], matchIndex) => {
+                                                // Mỗi parent có 2 children nodes, tạo thành 1 trận đấu
+                                                const player1 = players ? players.filter(p => p.sourceNode === children[0])[0] : { name: `Player ${children[0] || 'TBD1'}` };
+                                                const player2 = players ? players.filter(p => p.sourceNode === children[1])[0] : { name: `Player ${children[1] || 'TBD2'}` };
+                                                // console.log("Children nodes:", children);
+                                                // console.log("Player 1:", player1);
+                                                // console.log("Player 2:", player2);
+                                                return (
+                                                    <NodeGroup
+                                                        key={`${roundDataIndex}-${parentId}-${matchIndex}`}
+                                                        player1={player1}
+                                                        player2={player2}
+                                                        numberMatch={matchIndex + 1}
+                                                        targetNode={parseInt(parentId)}
+                                                    />
+                                                );
+                                            })
+                                        )}
+                                </div>
                             </div>
-                            <div>
-                                {Array.from({ length: matchCount }, (_, matchIndex) => {
-                                    const currentPlayersArray = ensurePlayersArray();
-                                    const player1Index = roundStart + matchIndex * 2;
-                                    const player2Index = roundStart + matchIndex * 2 + 1;
-
-                                    // console.log('matchCount: ', matchCount)
-                                    // console.log(`Round ${roundIndex + 1}, Match ${matchIndex + 1}: Player1 Index = ${player1Index}, Player2 Index = ${player2Index}`);
-                                    return (
-                                        <SigmaBoxDouble
-                                            key={`${roundIndex}-${matchIndex}`}
-                                            player1={player1Index >= 0 && player1Index < currentPlayersArray.length ? currentPlayersArray[player1Index] : undefined}
-                                            player2={player2Index >= 0 && player2Index < currentPlayersArray.length ? currentPlayersArray[player2Index] : undefined}
-                                            onPlayer1Change={
-                                                player1Index >= 0 && player1Index < currentPlayersArray.length
-                                                    ? (name) => handlePlayerNameChange(player1Index, name)
-                                                    : undefined
-                                            }
-                                            onPlayer2Change={
-                                                player2Index >= 0 && player2Index < currentPlayersArray.length
-                                                    ? (name) => handlePlayerNameChange(player2Index, name)
-                                                    : undefined
-                                            }
-                                            roundIndex={roundIndex}
-                                            matchIndex={matchIndex}
-                                            isFirstRound={roundIndex === 0}
-                                            onAdvanceWinner={(winner) => advanceWinner(roundIndex, matchIndex, winner)}
-                                        />
-                                    )
-                                })}
-                            </div>
-                        </div>
-                    )
-                })}
+                        )
+                    })}
             </div>
+            {/* <NodeGroup
+                player1={players && players[0] ? players[0] : { id: 0, name: 'TBD1' }}
+                player2={players && players[1] ? players[1] : { id: 0, name: 'TBD2' }}
+            /> */}
         </div>
     )
 }

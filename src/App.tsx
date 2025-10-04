@@ -3,22 +3,20 @@ import ScrollToTop from './utils/ScrollToTop';
 import { ToastContainer } from 'react-toastify';
 import './App.css'
 
-// import SigmaTest from './components/Sigma/SigmaTest';
-import Poomsae from './components/Poomsae/Poomsae';
-// import Navbar from './components/Navbar/Navbar';
-
-
+import Navbar from './components/Navbar/Navbar';
+import PoomsaeSigma from './components/Poomsae/PoomsaeSigma';
 
 function App() {
   return (
     <div className="App">
       <ScrollToTop />
-      {/* <Navbar /> */}
+      <Navbar />
 
       <Routes>
         <Route path="/" element={<Navigate to="/home" />} />
 
-        <Route path="/sigma" element={<Poomsae />} />
+        <Route path='/poomsae/list' element={<div>Poomsae List Page</div>} />
+        <Route path="/poomsae/sigma" element={<PoomsaeSigma />} />
 
         <Route path="/login" element={<div>Login Page</div>} />
         <Route path="/sign-up-account" element={<div>Sign Up Page</div>} />
