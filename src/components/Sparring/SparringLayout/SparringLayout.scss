@@ -1,0 +1,52 @@
+.sparring-layout-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #eff6ff 0%, #ffffff 50%, #fef2f2 100%);
+
+    .header {
+        background: linear-gradient(135deg, #2563eb 0%, #dc2626 100%);
+        color: white;
+        padding: 2rem 1.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-self: start;
+            gap: 2rem;
+            flex-wrap: wrap;
+
+            .header-title {
+                display: flex;
+                align-items: center;
+                gap: 3rem;
+                margin-bottom: 0.5rem;
+
+                .trophy-icon {
+                    width: 3rem;
+                    height: 3rem;
+                }
+
+                h1 {
+                    font-size: 2.5rem;
+                    font-weight: 700;
+                    margin: 0;
+                    color: white;
+                }
+            }
+
+            .header-subtitle {
+                color: rgba(219, 234, 254, 0.9);
+                margin-top: 0.25rem;
+                font-size: 1.1rem;
+            }
+        }
+    }
+
+    .main-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+    }
+}

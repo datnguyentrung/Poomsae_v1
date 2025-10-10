@@ -1,13 +1,20 @@
 import './Sigma.scss';
 import NodeGroup from "./NodeGroup";
 import { getTournamentStructure, getTotalPlayersNeeded, getLabelForMatch } from "../../utils/NodeUtils";
-import type { Node as BracketNode, PoomsaeHistory } from '@/types/types';
+import type { Node as BracketNode } from '@/types/types';
+import type { PoomsaeHistory } from '@/types/Tournament/Poomsae';
+import type { SparringHistory } from '@/types/Tournament/Sparring';
 import { getBracketNodesByParticipants } from '@/services/BracketNode';
 import type { SigmaData } from '@/types/types';
 import { PoomsaeSigmaLocalStorage } from '@/utils/PoomsaeSigmaStorage';
 import React from 'react';
 
-export default function Sigma({ players, participants }: { players?: PoomsaeHistory[], participants?: number }) {
+type Props = {
+    players?: PoomsaeHistory[] | SparringHistory[],
+    participants?: number
+}
+
+export default function Sigma({ players, participants }: Props) {
     const [bracketNodes, setBracketNodes] = React.useState<BracketNode[]>([]);
     const [loading, setLoading] = React.useState(false);
     const [cachedParticipants, setCachedParticipants] = React.useState<number | null>(null);
@@ -30,28 +37,45 @@ export default function Sigma({ players, participants }: { players?: PoomsaeHist
 
     // console.log("Tournament Structure:", structure);
 
-    // Function để tạo PoomsaeSigma data từ bracket structure
+    /**
+     * Creates Sigma data structure from bracket nodes
+     * @param bracketNodes - Array of bracket nodes from the tournament structure
+     * @param currentParticipants - Number of participants in the tournament
+     * @returns Array of SigmaData containing tournament structure information
+     */
     const createSigmaData = React.useCallback((bracketNodes: BracketNode[], currentParticipants: number): SigmaData[] => {
+        if (!bracketNodes.length || currentParticipants <= 0) {
+            return [];
+        }
+        console.log('bracketNode: ', bracketNodes);
+
         const sigmaData: SigmaData[] = [];
         const nodeStructure = getTournamentStructure(bracketNodes);
 
-        // console.log("Node Structure for Sigma Data:", nodeStructure);
-
         nodeStructure.forEach((levelData) => {
-            const roundIndex = nodeStructure.length - levelData.level; // Reverse để có đúng round order
-            const roundLabel = getLabelForMatch({ roundIndex, totalRounds: nodeStructure.length });
+            const roundIndex = nodeStructure.length - levelData.level;
+            const roundLabel = getLabelForMatch({
+                roundIndex,
+                totalRounds: nodeStructure.length
+            });
 
             Object.entries(levelData.parents).forEach(([parentIdStr, children], matchIndex) => {
-                const parentId = parentIdStr === 'null' ? null : parseInt(parentIdStr);
+                const parentNode = parentIdStr === 'null' ? null : parseInt(parentIdStr, 10);
 
-                // Tạo record cho mỗi child node
                 children.forEach(childId => {
+                    // Chỉ tìm node có childNodeId khớp chính xác với childId
+                    const correspondingBracketNode = bracketNodes.find(node =>
+                        node.childNodeId === childId
+                    );
+                    console.log('childId:', childId, 'found node:', correspondingBracketNode, 'bracketNodes length:', correspondingBracketNode?.bracketNodes?.length);
+
                     sigmaData.push({
                         childNode: childId,
-                        parentNode: parentId,
+                        parentNode,
                         round: roundLabel,
                         match: matchIndex + 1,
-                        participants: currentParticipants
+                        participants: currentParticipants,
+                        bracketNodes: correspondingBracketNode?.bracketNodes ?? []
                     });
                 });
             });
@@ -73,6 +97,7 @@ export default function Sigma({ players, participants }: { players?: PoomsaeHist
                 try {
                     // console.log(`🔄 Fetching bracket nodes for ${currentParticipants} participants`);
                     const data = await getBracketNodesByParticipants(currentParticipants);
+                    // console.log('data: ', data);
                     setBracketNodes(data);
                     setCachedParticipants(currentParticipants);
 
@@ -109,6 +134,7 @@ export default function Sigma({ players, participants }: { players?: PoomsaeHist
                 {structure.level
                     .sort((a, b) => b - a)
                     .map((round, roundIndex) => {
+                        // console.log('structure: ', structure);
                         if (round === 0) return null; // Skip the first round (level 0) if needed
                         return (
                             <div key={roundIndex} className='round-section'>
@@ -119,23 +145,27 @@ export default function Sigma({ players, participants }: { players?: PoomsaeHist
                                     {structure.round && structure.round
                                         .filter(s => s.level === round)
                                         .map((roundData, roundDataIndex) =>
-                                            Object.entries(roundData.parents).map(([parentId, children], matchIndex) => {
-                                                // Mỗi parent có 2 children nodes, tạo thành 1 trận đấu
-                                                const player1 = players ? players.filter(p => p.sourceNode === children[0])[0] : { name: `Player ${children[0] || 'TBD1'}` };
-                                                const player2 = players ? players.filter(p => p.sourceNode === children[1])[0] : { name: `Player ${children[1] || 'TBD2'}` };
-                                                // console.log("Children nodes:", children);
-                                                // console.log("Player 1:", player1);
-                                                // console.log("Player 2:", player2);
-                                                return (
-                                                    <NodeGroup
-                                                        key={`${roundDataIndex}-${parentId}-${matchIndex}`}
-                                                        player1={player1}
-                                                        player2={player2}
-                                                        numberMatch={matchIndex + 1}
-                                                        targetNode={parseInt(parentId)}
-                                                    />
-                                                );
-                                            })
+                                            Object.entries(roundData.parents)
+                                                .map(([parentId, children], matchIndex) => {
+                                                    // Sắp xếp children tăng dần
+                                                    const sortedChildren = [...children].sort((a, b) => a - b);
+                                                    // Mỗi parent có 2 children nodes, tạo thành 1 trận đấu
+                                                    const player1 = players ? players.filter(p => p.nodeInfo.sourceNode === sortedChildren[0])[0] : undefined;
+                                                    const player2 = players ? players.filter(p => p.nodeInfo.sourceNode === sortedChildren[1])[0] : undefined;
+                                                    // console.log("Children nodes:", children);
+                                                    // console.log("Player 1:", player1);
+                                                    // console.log("Player 2:", player2);
+                                                    return (
+                                                        <NodeGroup
+                                                            key={`${roundDataIndex}-${parentId}-${matchIndex}`}
+                                                            player1={player1}
+                                                            player2={player2}
+                                                            numberMatch={matchIndex + 1}
+                                                            targetNode={parseInt(parentId)}
+                                                            participants={participants}
+                                                        />
+                                                    );
+                                                })
                                         )}
                                 </div>
                             </div>

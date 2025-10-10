@@ -1,14 +1,14 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
-import type { PoomsaeHistory } from '@/types/Tournament/Poomsae';
+import type { SparringHistory } from '@/types/Tournament/Sparring';
 import Sigma from '../Sigma/Sigma';
-import { getAllPoomsaeHistories } from '@/services/tournament/Poomsae/PoomsaeHistoryService';
+import { getAllSparringHistories } from '@/services/tournament/Sparring/SparringHistoryService';
 // Dữ liệu ban đầu - có thể thay đổi số lượng players
 
-export default function PoomsaeSigma() {
+export default function SparringSigma() {
     const [searchParams] = useSearchParams();
-    const [poomsaeHistories, setPoomsaeHistories] = React.useState<PoomsaeHistory[]>([]);
-    const [filteredHistories, setFilteredHistories] = React.useState<PoomsaeHistory[]>([]);
+    const [sparringHistories, setSparringHistories] = React.useState<SparringHistory[]>([]);
+    const [filteredHistories, setFilteredHistories] = React.useState<SparringHistory[]>([]);
     const [isDataFetched, setIsDataFetched] = React.useState(false);
 
     const combinationId = searchParams.get('combination');
@@ -18,34 +18,34 @@ export default function PoomsaeSigma() {
     React.useEffect(() => {
         if (isDataFetched) return; // Ngăn gọi lại nếu đã fetch
 
-        const fetchPoomsaeHistories = async () => {
+        const fetchSparringHistories = async () => {
             try {
-                const histories = await getAllPoomsaeHistories();
-                setPoomsaeHistories(histories);
+                const histories = await getAllSparringHistories();
+                setSparringHistories(histories);
                 setIsDataFetched(true); // Đánh dấu đã fetch xong
             } catch (error) {
-                console.error('Error fetching poomsae histories:', error);
+                console.error('Error fetching sparring histories:', error);
             }
         };
 
-        fetchPoomsaeHistories();
+        fetchSparringHistories();
     }, [isDataFetched])
 
     React.useEffect(() => {
-        if (combinationId && poomsaeHistories.length > 0) {
+        if (combinationId && sparringHistories.length > 0) {
             // Filter histories by combination ID
-            const filtered = poomsaeHistories.filter(history =>
-                history.referenceInfo?.poomsaeCombination === combinationId
+            const filtered = sparringHistories.filter(history =>
+                history.referenceInfo?.sparringCombination === combinationId
             );
             setFilteredHistories(filtered);
             // console.log(`Filtered histories for combination ${combinationId}:`, filtered);
         } else {
             // If no combination ID, show all histories
-            setFilteredHistories(poomsaeHistories);
+            setFilteredHistories(sparringHistories);
         }
-    }, [combinationId, poomsaeHistories]);
+    }, [combinationId, sparringHistories]);
 
-    // console.log("All Players:", poomsaeHistories);
+    // console.log("All Players:", sparringHistories);
     // console.log("Filtered Players:", filteredHistories);
 
     return (
@@ -56,7 +56,8 @@ export default function PoomsaeSigma() {
                     <p>Số vận động viên: <strong>{participants}</strong></p>
                 </div>
             )}
-            <Sigma players={filteredHistories} participants={participants} />
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            <Sigma players={filteredHistories as any} participants={participants} />
         </div>
     )
 }

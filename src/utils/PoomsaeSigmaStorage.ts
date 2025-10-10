@@ -85,6 +85,19 @@ export class PoomsaeSigmaLocalStorage {
         return this.index?.get(childNodeId) || null;
     }
 
+    /**
+     * Tìm dữ liệu theo childNodeId trong bảng participants cụ thể
+     * @param childNodeId - ID của child node cần tìm
+     * @param participants - Số lượng participants để xác định bảng cần tìm
+     * @returns SigmaData nếu tìm thấy, null nếu không tìm thấy
+     */
+    static findByChildNodeInParticipants(childNodeId: number, participants: number): SigmaData | null {
+        const data = this.get(participants);
+        if (!data) return null;
+
+        return data.find(entry => entry.childNode === childNodeId) || null;
+    }
+
     // Cập nhật danh sách key trong localStorage khi thêm mới
     private static updateKeysList(newKey: string): void {
         const existingKeys = this.getAllKeys();

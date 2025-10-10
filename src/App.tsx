@@ -1,25 +1,34 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import ScrollToTop from './utils/ScrollToTop';
 import { ToastContainer } from 'react-toastify';
 import './App.css'
 
 import Navbar from './components/Navbar/Navbar';
 import PoomsaeSigma from './components/Poomsae/PoomsaeSigma';
+import PoomsaeLayout from './components/Poomsae/PoomsaeLayout/PoomsaeLayout';
+
+import SparringSigma from './components/Sparring/SparringSigma';
+import SparringLayout from './components/Sparring/SparringLayout/SparringLayout';
+import LoginForm from './components/Auth/LoginForm';
 
 function App() {
+  const location = useLocation();
   return (
     <div className="App">
       <ScrollToTop />
-      <Navbar />
-
+      {/* Hiện Navbar nếu KHÔNG ở trang đăng nhập/đăng ký */}
+      {(location.pathname !== '/login' && location.pathname !== '/sign-up-account') && <Navbar />}
       <Routes>
         <Route path="/" element={<Navigate to="/home" />} />
 
-        <Route path='/poomsae/list' element={<div>Poomsae List Page</div>} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/sign-up-account" element={<div>Sign Up Page</div>} />
+
+        <Route path='/poomsae/layout' element={<PoomsaeLayout />} />
         <Route path="/poomsae/sigma" element={<PoomsaeSigma />} />
 
-        <Route path="/login" element={<div>Login Page</div>} />
-        <Route path="/sign-up-account" element={<div>Sign Up Page</div>} />
+        <Route path='/sparring/layout' element={<SparringLayout />} />
+        <Route path="/sparring/sigma" element={<SparringSigma />} />
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
 
