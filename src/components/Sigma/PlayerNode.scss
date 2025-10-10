@@ -1,0 +1,40 @@
+.player-node-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+}
+
+.player-delete-icon {
+    cursor: pointer;
+    color: var(--red-500);
+    background-color: var(--red-50);
+    border-radius: 50%;
+    padding: 0.25rem;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+
+    &:hover {
+        color: var(--red-700);
+        background-color: var(--red-100);
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    &:active {
+        transform: scale(0.95);
+        background-color: var(--red-200);
+    }
+
+    &:focus {
+        outline: 2px solid var(--red-300);
+        outline-offset: 2px;
+    }
+}

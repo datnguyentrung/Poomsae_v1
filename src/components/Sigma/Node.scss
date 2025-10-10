@@ -5,16 +5,38 @@
     cursor: pointer;
     transition: all 0.2s ease; // thêm mượt mà
     width: 150px;
+    font-size: 0.75rem;
 
-    &:hover {
-        background-color: var(--yellow-200);
-        border-color: var(--yellow-500);
+    &-chung {
+        background-color: var(--blue-50);
+        border-color: var(--blue-400);
+
+        &:hover {
+            background-color: var(--blue-200);
+            border-color: var(--blue-500);
+        }
     }
 
-    &:active {
-        background-color: var(--yellow-300); // màu khi nhấn
-        border-color: var(--yellow-600);
-        transform: scale(0.95); // hiệu ứng thu nhỏ nhẹ khi nhấn
+    &-hong {
+        background-color: var(--red-50);
+        border-color: var(--red-400);
+
+        &:hover {
+            background-color: var(--red-200);
+            border-color: var(--red-500);
+        }
+    }
+
+    &-waiting {
+        background-color: var(--gray-50);
+        border-color: var(--gray-400);
+        font-style: italic;
+        color: var(--gray-600);
+
+        &:hover {
+            background-color: var(--gray-200);
+            border-color: var(--gray-500);
+        }
     }
 }
 
@@ -23,4 +45,10 @@
     border: 2px solid var(--yellow-400);
     padding: 6px;
     border-radius: 12px;
+}
+
+.node-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }

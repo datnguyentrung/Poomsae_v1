@@ -37,12 +37,20 @@ export interface Node {
     participants: number;
 }
 
-export interface PoomsaeHistory {
-    name?: string;
-    sourceNode?: number;
-    targetNode?: number;
-    levelNode?: number;
-    hasWon?: boolean;
+export interface NodeInfo {
+    sourceNode: number;
+    targetNode: number;
+    levelNode: number;
+}
+
+export interface ReferenceInfo {
+    name: string;
+
+    poomsaeList?: string;
+    poomsaeCombination?: string;
+
+    sparringList?: string;
+    sparringCombination?: string;
 }
 
 export interface SigmaData {
@@ -51,4 +59,5 @@ export interface SigmaData {
     round: string;
     match: number;
     participants?: number;
+    bracketNodes?: number[];
 }

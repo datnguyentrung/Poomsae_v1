@@ -38,7 +38,7 @@ export const getTournamentStructure = (nodeList: Node[]) => {
 
         return {
             level,
-            parents
+            parents,
         };
     });
 };

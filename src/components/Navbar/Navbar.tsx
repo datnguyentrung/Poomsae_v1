@@ -18,14 +18,14 @@ const navbarSections: NavbarSection[] = [
     {
         title: 'Quyền',
         items: [
-            { link: '/poomsae/list', title: 'Danh Sách', icon: UsersRound },
+            { link: '/poomsae/layout', title: 'Danh Sách', icon: UsersRound },
             { link: '/poomsae/sigma', title: 'Sơ Đồ Thi Đấu', icon: Boxes },
         ]
     },
     {
         title: 'Đối Kháng',
         items: [
-            { link: '/sparring/list', title: 'Danh Sách', icon: UsersRound },
+            { link: '/sparring/layout', title: 'Danh Sách', icon: UsersRound },
             { link: '/sparring/sigma', title: 'Sơ Đồ Thi Đấu', icon: Boxes },
         ]
     },
