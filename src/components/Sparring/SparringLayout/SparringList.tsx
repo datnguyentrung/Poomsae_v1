@@ -39,7 +39,7 @@ export default function SparringList({ selectedCombination, listSparringDTO }: P
         createSparringHistory(filteredList.map(item => item.idSparringList));
     }
 
-    console.log('Filtered List:', filteredList.map(item => item.idSparringList));
+    // console.log('Filtered List:', filteredList.map(item => item.idSparringList));
 
     return (
         <div className='sparring-list-container'>
@@ -59,6 +59,8 @@ export default function SparringList({ selectedCombination, listSparringDTO }: P
                             to={`/sparring/sigma?${new URLSearchParams({
                                 combination: selectedCombination.idSparringCombination,
                                 participants: filteredList.length.toString(),
+                                ageGroup: selectedCombination.ageGroup?.ageGroupName || '',
+                                weightClass: selectedCombination.sparringContent?.weightClass || '',
                             })}`}
                         >
                             <button>Xem sơ đồ thi đấu</button>
@@ -69,13 +71,13 @@ export default function SparringList({ selectedCombination, listSparringDTO }: P
                         </button>
                     )}
 
-                    <button onClick={handleCreateSparringHistory}>Tạo sơ đồ thi đấu</button>
+                    {/* <button onClick={handleCreateSparringHistory}>Tạo sơ đồ thi đấu</button> */}
                 </div>
                 <div className='table-content'>
                     <table>
                         <thead>
                             <tr>
-                                <th>Vị trí sơ đồ thi đấu</th>
+                                <th>Số thứ tự</th>
                                 <th>Sàn đấu</th>
                                 <th>Họ tên</th>
                                 <th>Cấp đai</th>
@@ -95,7 +97,7 @@ export default function SparringList({ selectedCombination, listSparringDTO }: P
                                     const student = item.competitor.personalAcademicInfo;
                                     return (
                                         <tr key={index}>
-                                            <td>Tứ kết - Trận {index + 1}</td>
+                                            <td>{index + 1}</td>
                                             <td>
                                                 <span className={`court-badge court-chung`}>
                                                     <span className='court-dot'></span>

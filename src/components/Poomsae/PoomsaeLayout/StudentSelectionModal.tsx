@@ -27,6 +27,7 @@ export default function StudentSelectionModal({ isOpen, onClose, onAddStudents, 
     // list of all students
     const [listStudents, setListStudents] = React.useState<StudentType[]>([])
 
+    console.log('listPoomsaeLists:', listPoomsaeLists)
 
     React.useEffect(() => {
         const fetchStudents = async () => {

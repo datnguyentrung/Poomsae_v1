@@ -1,6 +1,7 @@
 import axiosInstance from "@/api/axiosInstance";
 import { endpoints } from "@/api/endpoints";
 import type { PoomsaeHistory } from "@/types/Tournament/Poomsae";
+import { toast } from "react-toastify";
 
 export const getAllPoomsaeHistories = async () => {
     try {
@@ -17,9 +18,11 @@ export const createPoomsaeHistory = async (idPoomsaeList: string[]) => {
     try {
         const response = await axiosInstance.post(endpoints.poomsaeHistory.create, idPoomsaeList);
         console.log('Created poomsae history:', response.data.data);
+        toast.success("Thêm danh sách vận động viên thành công!");
         return response.data.data;
     } catch (error) {
         console.error("Error creating poomsae history:", error);
+        toast.error("Thêm danh sách vận động viên thất bại!");
         throw error;
     }
 };
@@ -62,6 +65,22 @@ export const deletePoomsaeHistory = async (idPoomsaeHistory: string, participant
         return response.data;
     } catch (error) {
         console.error("Error deleting poomsae history:", error);
+        throw error;
+    }
+};
+
+export const deletePoomsaeHistoryByCombination = async (idPoomsaeCombination: string) => {
+    try {
+        const response = await axiosInstance.delete(
+            endpoints.poomsaeHistory.delete,
+            {
+                params: { idPoomsaeCombination } // ✅ dùng params, không dùng data
+            }
+        );
+        console.log('Deleted poomsae history by combination:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting poomsae history by combination:", error);
         throw error;
     }
 };

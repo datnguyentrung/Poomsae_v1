@@ -11,10 +11,26 @@ import React from 'react';
 
 type Props = {
     players?: PoomsaeHistory[] | SparringHistory[],
-    participants?: number
+    participants?: number,
+    content?: string, // Thêm prop poomsaeContent
+    onRefresh?: () => Promise<void>,
 }
 
-export default function Sigma({ players, participants }: Props) {
+// const data1 = {
+//     idPoomsaeHistory: "player-1",
+//     nodeInfo: { sourceNode: 5, targetNode: -1, levelNode: -1 },
+//     referenceInfo: { name: "Trần Thị B", poomsaeList: "taegeuk-2", poomsaeCombination: "combo-2" },
+//     hasWon: false
+// }
+
+// const data2 = {
+//     idPoomsaeHistory: "bronze-player-2",
+//     nodeInfo: { sourceNode: 14, targetNode: -1, levelNode: -1 },
+//     referenceInfo: { name: "Hoàng Thị F", poomsaeList: "taegeuk-6", poomsaeCombination: "combo-6" },
+//     hasWon: false
+// }
+
+export default function Sigma({ players, participants, content, onRefresh }: Props) {
     const [bracketNodes, setBracketNodes] = React.useState<BracketNode[]>([]);
     const [loading, setLoading] = React.useState(false);
     const [cachedParticipants, setCachedParticipants] = React.useState<number | null>(null);
@@ -35,7 +51,7 @@ export default function Sigma({ players, participants }: Props) {
         return { level: [], totalRounds: 0, round: [] };
     }, [bracketNodes, participants, players?.length]);
 
-    // console.log("Tournament Structure:", structure);
+    console.log("Tournament Structure:", structure);
 
     /**
      * Creates Sigma data structure from bracket nodes
@@ -47,7 +63,7 @@ export default function Sigma({ players, participants }: Props) {
         if (!bracketNodes.length || currentParticipants <= 0) {
             return [];
         }
-        console.log('bracketNode: ', bracketNodes);
+        // console.log('bracketNode: ', bracketNodes);
 
         const sigmaData: SigmaData[] = [];
         const nodeStructure = getTournamentStructure(bracketNodes);
@@ -67,7 +83,7 @@ export default function Sigma({ players, participants }: Props) {
                     const correspondingBracketNode = bracketNodes.find(node =>
                         node.childNodeId === childId
                     );
-                    console.log('childId:', childId, 'found node:', correspondingBracketNode, 'bracketNodes length:', correspondingBracketNode?.bracketNodes?.length);
+                    // console.log('childId:', childId, 'found node:', correspondingBracketNode, 'bracketNodes length:', correspondingBracketNode?.bracketNodes?.length);
 
                     sigmaData.push({
                         childNode: childId,
@@ -128,6 +144,30 @@ export default function Sigma({ players, participants }: Props) {
         );
     }
 
+    const renderBronzeMatch = () => {
+        const player = players ? players
+            .filter(p => p.nodeInfo.levelNode === -1 && p.nodeInfo.targetNode === -1)
+            .sort((a, b) => a.nodeInfo.sourceNode - b.nodeInfo.sourceNode)
+            : [];
+        if (player.length < 1) return null; // Chỉ hiển thị nếu có đúng 2 người chơi cho trận tranh hạng 3
+        // console.log("Bronze match players:", player.length);
+        return (
+            <div className='bronze-match'>
+                <h3>
+                    {getLabelForMatch({ roundIndex: structure.totalRounds + 1, totalRounds: structure.totalRounds })}
+                </h3>
+                <NodeGroup
+                    player1={player[0]}
+                    player2={player[1]}
+                    targetNode={-1} // Sử dụng -1 để biểu thị node tranh hạng 3
+                    participants={participants}
+                    content={content}
+                    onRefresh={onRefresh}
+                />
+            </div>
+        )
+    }
+
     return (
         <div className='sigma'>
             <div className='round-container'>
@@ -150,8 +190,12 @@ export default function Sigma({ players, participants }: Props) {
                                                     // Sắp xếp children tăng dần
                                                     const sortedChildren = [...children].sort((a, b) => a - b);
                                                     // Mỗi parent có 2 children nodes, tạo thành 1 trận đấu
-                                                    const player1 = players ? players.filter(p => p.nodeInfo.sourceNode === sortedChildren[0])[0] : undefined;
-                                                    const player2 = players ? players.filter(p => p.nodeInfo.sourceNode === sortedChildren[1])[0] : undefined;
+                                                    const player1 = players ? players.filter(p =>
+                                                        p.nodeInfo.sourceNode === sortedChildren[0]
+                                                        && p.nodeInfo.targetNode.toString() === parentId)[0] : undefined;
+                                                    const player2 = players ? players.filter(p =>
+                                                        p.nodeInfo.sourceNode === sortedChildren[1]
+                                                        && p.nodeInfo.targetNode.toString() === parentId)[0] : undefined;
                                                     // console.log("Children nodes:", children);
                                                     // console.log("Player 1:", player1);
                                                     // console.log("Player 2:", player2);
@@ -163,6 +207,8 @@ export default function Sigma({ players, participants }: Props) {
                                                             numberMatch={matchIndex + 1}
                                                             targetNode={parseInt(parentId)}
                                                             participants={participants}
+                                                            content={content}
+                                                            onRefresh={onRefresh}
                                                         />
                                                     );
                                                 })
@@ -172,10 +218,8 @@ export default function Sigma({ players, participants }: Props) {
                         )
                     })}
             </div>
-            {/* <NodeGroup
-                player1={players && players[0] ? players[0] : { id: 0, name: 'TBD1' }}
-                player2={players && players[1] ? players[1] : { id: 0, name: 'TBD2' }}
-            /> */}
+
+            {renderBronzeMatch()}
         </div>
     )
 }

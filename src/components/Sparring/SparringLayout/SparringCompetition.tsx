@@ -39,7 +39,7 @@ export default function SparringCompetition({
 
     const [allAgeGroups, setAllAgeGroups] = React.useState<AgeGroupType[]>([])
     const [allGenders] = React.useState<string[]>(['MALE', 'FEMALE'])
-    const [allSparringContents, setAllSparringContents] = React.useState<SparringContentType[]>([])
+    // const [allSparringContents, setAllSparringContents] = React.useState<SparringContentType[]>([])
     const [allSparringCombinations, setAllSparringCombinations] = React.useState<SparringCombinationType[]>([])
 
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false)
@@ -70,7 +70,6 @@ export default function SparringCompetition({
 
             setAllAgeGroups(fetchedAgeGroups)
             setAllSparringCombinations(fetchedSparringCombinations)
-            setAllSparringContents(fetchedSparringContents)
 
             // Mặc định chọn phần tử đầu tiên nếu có dữ liệu
             if (fetchedAgeGroups.length > 0) setAgeGroups(fetchedAgeGroups[0])
@@ -87,6 +86,7 @@ export default function SparringCompetition({
                 && combination.gender === gender
                 && combination.sparringContent.idSparringContent === sparringContents.idSparringContent
             )
+            console.log('Selected Combination:', combination)
             setSelectedCombination(combination || null)
         }
     }, [gender, ageGroups, sparringContents, allSparringCombinations, setSelectedCombination])
@@ -133,19 +133,6 @@ export default function SparringCompetition({
 
     return (
         <div className='sparring-competition-container'>
-            {/* Sparring Content Selection */}
-            <div className='sparring-content-container'>
-                {allSparringContents.map((content) => (
-                    <div
-                        key={content.idSparringContent}
-                        className={`sparring-content-item ${sparringContents?.idSparringContent === content.idSparringContent ? 'active' : ''}`}
-                        onClick={() => handleContentSelect(content)}
-                    >
-                        {content.weightClass}
-                    </div>
-                ))}
-            </div>
-
             {/* Controls Container */}
             <div className='controls-container'>
                 <div className='group-controls'>
@@ -205,6 +192,45 @@ export default function SparringCompetition({
                     <Plus className='plus-icon' />
                     <span>Thêm vận động viên</span>
                 </button>
+            </div>
+
+            {/* Sparring Content Selection */}
+            <div className='sparring-content-container'>
+                {(() => {
+                    const filteredCombinations = allSparringCombinations
+                        .filter(combination => combination.ageGroup.idAgeGroup === ageGroups?.idAgeGroup
+                            && combination.gender === gender
+                            && combination.active
+                        )
+                        .sort((a, b) => parseFloat(a.sparringContent.weightClass) - parseFloat(b.sparringContent.weightClass));
+
+                    if (filteredCombinations.length === 0) {
+                        return (
+                            <div className="no-content-message">
+                                <div className="no-content-icon">⚖️</div>
+                                <div className="no-content-text">
+                                    Không có hạng cân cho{' '}
+                                    <strong>
+                                        {ageGroups ? getDisplayName(AgeGroupMap, ageGroups.ageGroupName) : 'lứa tuổi'} - {gender ? getDisplayName(GenderMap, gender) : 'giới tính'}
+                                    </strong>
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    return filteredCombinations.map((combination) => {
+                        console.log('allSparringCombinations: ', combination)
+                        return (
+                            <div
+                                key={combination.sparringContent.idSparringContent}
+                                className={`sparring-content-item ${sparringContents?.idSparringContent === combination.sparringContent.idSparringContent ? 'active' : ''}`}
+                                onClick={() => handleContentSelect(combination.sparringContent)}
+                            >
+                                {combination.sparringContent.weightClass} kg
+                            </div>
+                        )
+                    });
+                })()}
             </div>
 
             {/* Student Selection Modal */}

@@ -46,6 +46,8 @@ export const getTournamentStructure = (nodeList: Node[]) => {
 
 export const getLabelForMatch = ({ roundIndex, totalRounds }: { roundIndex: number, totalRounds: number }) => {
     switch (roundIndex) {
+        case totalRounds + 1:
+            return "Tranh hạng 3";
         case totalRounds:
             return "🏆"
         case totalRounds - 1:

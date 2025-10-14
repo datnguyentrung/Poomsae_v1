@@ -17,7 +17,11 @@ function App() {
     <div className="App">
       <ScrollToTop />
       {/* Hiện Navbar nếu KHÔNG ở trang đăng nhập/đăng ký */}
-      {(location.pathname !== '/login' && location.pathname !== '/sign-up-account') && <Navbar />}
+      {!(
+        location.pathname.includes('sigma') ||
+        location.pathname === '/login' ||
+        location.pathname === '/sign-up-account'
+      ) && <Navbar />}
       <Routes>
         <Route path="/" element={<Navigate to="/home" />} />
 

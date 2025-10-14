@@ -17,6 +17,10 @@ interface PlayerNodeProps {
     onChooseWinner: (player: PoomsaeHistory | SparringHistory) => void;
     /** Callback when a player node is deleted */
     onDeleteNode: (player: PoomsaeHistory | SparringHistory) => void;
+    /** Poomsae content for context (if applicable) */
+    content?: string;
+    /** Callback to refresh data after changes */
+    onRefresh?: () => Promise<void>;
 }
 
 /**
@@ -28,7 +32,9 @@ const PlayerNode: React.FC<PlayerNodeProps> = React.memo(({
     nodeStatus,
     participants,
     onChooseWinner,
-    onDeleteNode
+    onDeleteNode,
+    content,
+    onRefresh
 }) => {
     const [canDelete, setCanDelete] = React.useState<boolean>(false);
 
@@ -50,8 +56,8 @@ const PlayerNode: React.FC<PlayerNodeProps> = React.memo(({
                     sigmaData = PoomsaeSigmaLocalStorage.findByChildNode(player.nodeInfo.sourceNode);
                 }
 
-                console.log(`Sigma Data for deletability check (participants: ${participants}):`, sigmaData);
-                console.log("Bracket Nodes Length:", sigmaData?.bracketNodes?.length);
+                // console.log(`Sigma Data for deletability check (participants: ${participants}):`, sigmaData);
+                // console.log("Bracket Nodes Length:", sigmaData?.bracketNodes?.length);
                 setCanDelete(sigmaData?.bracketNodes?.length !== 1);
             } catch (error) {
                 console.error("Error checking player deletability:", error);
@@ -78,6 +84,8 @@ const PlayerNode: React.FC<PlayerNodeProps> = React.memo(({
                 nodeStatus={nodeStatus}
                 participants={participants}
                 onChooseWinner={onChooseWinner}
+                content={content}
+                onRefresh={onRefresh}
             />
             {canDelete && player && (
                 <Delete

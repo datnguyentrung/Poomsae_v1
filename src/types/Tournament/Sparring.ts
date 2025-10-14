@@ -12,7 +12,7 @@ export interface SparringCombination {
     sparringContent: SparringContent;
     ageGroup: AgeGroup;
     gender: string;
-    isActive: boolean;
+    active: boolean;
 }
 
 export interface SparringList {

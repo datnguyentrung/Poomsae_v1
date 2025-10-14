@@ -38,6 +38,7 @@ export const endpoints = {
     },
     poomsaeCombination: {
         list: `${API_PREFIX}/poomsae-combinations`,  // ✅ Thêm trailing slash
+        changeActive: `${API_PREFIX}/poomsae-combinations/change-active`
     },
 
     sparringList: {

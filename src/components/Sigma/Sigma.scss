@@ -1,5 +1,8 @@
 .sigma {
     width: 100%;
+    display: flex;
+    // align-self: center;
+    // justify-content: center;
     overflow-x: auto;
     padding: 20px 0;
 }
@@ -38,3 +41,17 @@
 //     align-items: center;
 //     margin-bottom: 20px;
 // }
+
+.bronze-match {
+    // margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        white-space: nowrap;
+    }
+}

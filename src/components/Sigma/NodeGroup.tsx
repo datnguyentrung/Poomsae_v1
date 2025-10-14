@@ -13,11 +13,13 @@ interface NodeGroupProps {
     numberMatch?: number;
     targetNode?: number;
     participants?: number;
+    content?: string;
+    onRefresh?: () => Promise<void>;
 }
 
 type ModalMode = 'winner' | 'delete';
 
-export default function NodeGroup({ player1, player2, numberMatch, targetNode, participants }: NodeGroupProps) {
+const NodeGroup = React.memo(function NodeGroup({ player1, player2, numberMatch, targetNode, participants, content, onRefresh }: NodeGroupProps) {
     const [showConfirmModal, setShowConfirmModal] = React.useState<boolean>(false);
     const [selectedPlayer, setSelectedPlayer] = React.useState<PoomsaeHistory | SparringHistory | null>(null);
     const [modalMode, setModalMode] = React.useState<ModalMode>('winner');
@@ -43,7 +45,7 @@ export default function NodeGroup({ player1, player2, numberMatch, targetNode, p
     /**
      * Handles confirmation of winner or delete action
      */
-    const handleConfirmAction = React.useCallback(() => {
+    const handleConfirmAction = React.useCallback(async () => {
         if (!selectedPlayer) return;
 
         if (modalMode === 'winner') {
@@ -56,7 +58,12 @@ export default function NodeGroup({ player1, player2, numberMatch, targetNode, p
 
         setShowConfirmModal(false);
         setSelectedPlayer(null);
-    }, [modalMode, selectedPlayer]);
+
+        // Re-fetch data sau khi thay đổi
+        if (onRefresh) {
+            await onRefresh();
+        }
+    }, [modalMode, selectedPlayer, onRefresh]);
 
     /**
      * Handles cancellation of modal
@@ -91,12 +98,26 @@ export default function NodeGroup({ player1, player2, numberMatch, targetNode, p
                 targetNode={targetNode}
                 participants={participants}
                 player={winner}
+                onRefresh={onRefresh}
             />
         );
     };
 
+    // Tạo class CSS động dựa trên targetNode
+    const getNodeGroupClass = () => {
+        let baseClass = 'node-group-container';
+
+        if (targetNode === -1) {
+            baseClass += ' bronze-match-highlight'; // Tranh đồng hạng 3
+        } else if (targetNode === 0) {
+            baseClass += ' final-match-highlight';  // Chung kết tranh vàng
+        }
+
+        return baseClass;
+    };
+
     return (
-        <div className='node-group-container'>
+        <div className={getNodeGroupClass()}>
             {renderMatchNumber()}
 
             <div className='node-group'>
@@ -107,6 +128,8 @@ export default function NodeGroup({ player1, player2, numberMatch, targetNode, p
                         participants={participants}
                         onChooseWinner={handleChooseWinner}
                         onDeleteNode={handleDeleteNode}
+                        content={content}
+                        onRefresh={onRefresh}
                     />
 
                     <div className='vs' />
@@ -117,6 +140,8 @@ export default function NodeGroup({ player1, player2, numberMatch, targetNode, p
                         participants={participants}
                         onChooseWinner={handleChooseWinner}
                         onDeleteNode={handleDeleteNode}
+                        content={content}
+                        onRefresh={onRefresh}
                     />
                 </div>
 
@@ -124,26 +149,6 @@ export default function NodeGroup({ player1, player2, numberMatch, targetNode, p
 
                 {renderWinnerNode()}
             </div>
-
-            {/* Test buttons cho demo 2 modes */}
-            {/* <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                {player1 && (
-                    <button
-                        onClick={() => handleDeleteNode(player1)}
-                        style={{ padding: '0.5rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.8rem' }}
-                    >
-                        Xóa {player1.referenceInfo?.name}
-                    </button>
-                )}
-                {player2 && (
-                    <button
-                        onClick={() => handleDeleteNode(player2)}
-                        style={{ padding: '0.5rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.8rem' }}
-                    >
-                        Xóa {player2.referenceInfo?.name}
-                    </button>
-                )}
-            </div> */}
 
             <YesNoQuestion
                 isOpen={showConfirmModal}
@@ -155,4 +160,6 @@ export default function NodeGroup({ player1, player2, numberMatch, targetNode, p
             />
         </div>
     )
-}
+});
+
+export default NodeGroup;

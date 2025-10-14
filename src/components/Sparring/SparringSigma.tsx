@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import type { SparringHistory } from '@/types/Tournament/Sparring';
 import Sigma from '../Sigma/Sigma';
 import { getAllSparringHistories } from '@/services/tournament/Sparring/SparringHistoryService';
+import './SparringSigma.scss';
 // Dữ liệu ban đầu - có thể thay đổi số lượng players
 
 export default function SparringSigma() {
@@ -15,21 +16,28 @@ export default function SparringSigma() {
 
     const participants = Number(searchParams.get('participants')) || 0; // Số vận động viên tham gia, có thể thay đổi tùy theo yêu cầu
 
+    const ageGroup = searchParams.get('ageGroup') || '';
+    const weightClass = searchParams.get('weightClass') || '';
+
+    const fetchSparringHistories = React.useCallback(async () => {
+        try {
+            const histories = await getAllSparringHistories();
+            setSparringHistories(histories);
+            setIsDataFetched(true); // Đánh dấu đã fetch xong
+        } catch (error) {
+            console.error('Error fetching sparring histories:', error);
+        }
+    }, []);
+
+    const handleRefresh = React.useCallback(async () => {
+        console.log('Refreshing Sparring data...');
+        await fetchSparringHistories();
+    }, [fetchSparringHistories]);
+
     React.useEffect(() => {
         if (isDataFetched) return; // Ngăn gọi lại nếu đã fetch
-
-        const fetchSparringHistories = async () => {
-            try {
-                const histories = await getAllSparringHistories();
-                setSparringHistories(histories);
-                setIsDataFetched(true); // Đánh dấu đã fetch xong
-            } catch (error) {
-                console.error('Error fetching sparring histories:', error);
-            }
-        };
-
         fetchSparringHistories();
-    }, [isDataFetched])
+    }, [isDataFetched, fetchSparringHistories])
 
     React.useEffect(() => {
         if (combinationId && sparringHistories.length > 0) {
@@ -49,15 +57,62 @@ export default function SparringSigma() {
     // console.log("Filtered Players:", filteredHistories);
 
     return (
-        <div>
+        <div className="sparring-sigma__container">
             {combinationId && (
-                <div style={{ padding: '1rem', backgroundColor: '#f0f9ff', marginBottom: '1rem', borderRadius: '0.5rem' }}>
-                    {/* <p>Hiển thị sơ đồ thi đấu cho nội dung: <strong>{participants}</strong></p> */}
-                    <p>Số vận động viên: <strong>{participants}</strong></p>
+                <div className="sparring-sigma__header">
+                    <h2 className="sparring-sigma__title">
+                        Sơ đồ thi đấu Đối kháng
+                    </h2>
+                    
+                    <div className="sparring-sigma__combination">
+                        {ageGroup} - {weightClass}
+                    </div>
+                    
+                    <div className="sparring-sigma__info">
+                        <div className="sparring-sigma__info-item">
+                            <div className="sparring-sigma__info-icon">
+                                🏆
+                            </div>
+                            <div className="sparring-sigma__info-content">
+                                <div className="label">Nhóm tuổi</div>
+                                <div className="value">{ageGroup}</div>
+                            </div>
+                        </div>
+                        
+                        <div className="sparring-sigma__info-item">
+                            <div className="sparring-sigma__info-icon">
+                                ⚖️
+                            </div>
+                            <div className="sparring-sigma__info-content">
+                                <div className="label">Hạng cân</div>
+                                <div className="value">{weightClass}</div>
+                            </div>
+                        </div>
+                        
+                        <div className="sparring-sigma__info-item">
+                            <div className="sparring-sigma__info-icon">
+                                👥
+                            </div>
+                            <div className="sparring-sigma__info-content">
+                                <div className="label">Số vận động viên</div>
+                                <div className="value">{participants} người</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            <Sigma players={filteredHistories as any} participants={participants} />
+            
+            <div className="sparring-sigma__sigma-container">
+                {filteredHistories.length > 0 ? (
+                    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                    <Sigma players={filteredHistories as any} participants={participants} onRefresh={handleRefresh} />
+                ) : (
+                    <div className="sparring-sigma__no-data">
+                        <div className="icon">📊</div>
+                        <div className="message">Chưa có dữ liệu thi đấu</div>
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

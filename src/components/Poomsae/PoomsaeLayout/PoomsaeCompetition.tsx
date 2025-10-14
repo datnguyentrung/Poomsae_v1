@@ -41,7 +41,7 @@ export default function PoomsaeCompetition({
 
     const [allAgeGroups, setAllAgeGroups] = React.useState<AgeGroupType[]>([])
     const [allBeltGroups, setAllBeltGroups] = React.useState<BeltGroupType[]>([])
-    const [allPoomsaeContents, setAllPoomsaeContents] = React.useState<PoomsaeContentType[]>([])
+    // const [allPoomsaeContents, setAllPoomsaeContents] = React.useState<PoomsaeContentType[]>([])
     const [allPoomsaeCombinations, setAllPoomsaeCombinations] = React.useState<PoomsaeCombinationType[]>([])
 
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false)
@@ -74,7 +74,7 @@ export default function PoomsaeCompetition({
             setAllAgeGroups(fetchedAgeGroups)
             setAllBeltGroups(fetchedBeltGroups)
             setAllPoomsaeCombinations(fetchedPoomsaeCombinations)
-            setAllPoomsaeContents(fetchedPoomsaeContents)
+            // setAllPoomsaeContents(fetchedPoomsaeContents)
 
             // Mặc định chọn phần tử đầu tiên nếu có dữ liệu
             if (fetchedAgeGroups.length > 0) setAgeGroups(fetchedAgeGroups[0])
@@ -138,19 +138,6 @@ export default function PoomsaeCompetition({
 
     return (
         <div className='poomsae-competition-container'>
-            {/* Poomsae Content Selection */}
-            <div className='poomsae-content-container'>
-                {allPoomsaeContents.map((content) => (
-                    <div
-                        key={content.idPoomsaeContent}
-                        className={`poomsae-content-item ${poomsaeContents?.idPoomsaeContent === content.idPoomsaeContent ? 'active' : ''}`}
-                        onClick={() => handleContentSelect(content)}
-                    >
-                        {getDisplayName(PoomsaeContentMap, content.contentName)}
-                    </div>
-                ))}
-            </div>
-
             {/* Controls Container */}
             <div className='controls-container'>
                 <div className='group-controls'>
@@ -212,13 +199,53 @@ export default function PoomsaeCompetition({
                 </button>
             </div>
 
+            {/* Poomsae Content Selection */}
+            <div className='poomsae-content-container'>
+                {(() => {
+                    const filteredCombinations = allPoomsaeCombinations
+                        .filter(combination => combination.ageGroup.idAgeGroup === ageGroups?.idAgeGroup
+                            && combination.beltGroup.idBeltGroup === beltGroups?.idBeltGroup
+                            && combination.isActive
+                        )
+                        .sort((a, b) => a.poomsaeContent.contentName.localeCompare(b.poomsaeContent.contentName));
+
+                    if (filteredCombinations.length === 0) {
+                        return (
+                            <div className="no-content-message">
+                                <div className="no-content-icon">📋</div>
+                                <div className="no-content-text">
+                                    Không có nội dung cho{' '}
+                                    <strong>
+                                        {ageGroups ? getDisplayName(AgeGroupMap, ageGroups.ageGroupName) : 'lứa tuổi'} - {beltGroups ? getDisplayName(BeltGroupMap, beltGroups.beltGroupName) : 'nhóm đai'}
+                                    </strong>
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    return filteredCombinations.map((combination) => {
+                        // console.log('Rendering content item for:', combination.poomsaeContent);
+                        console.log(combination)
+                        return (
+                            <div
+                                key={combination.poomsaeContent.idPoomsaeContent}
+                                className={`poomsae-content-item ${poomsaeContents?.idPoomsaeContent === combination.poomsaeContent.idPoomsaeContent ? 'active' : ''}`}
+                                onClick={() => handleContentSelect(combination.poomsaeContent)}
+                            >
+                                {getDisplayName(PoomsaeContentMap, combination.poomsaeContent.contentName)}
+                            </div>
+                        )
+                    });
+                })()}
+            </div>
+
             {/* Student Selection Modal */}
             <StudentSelectionModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 onAddStudents={handleAddStudents}
                 selectedCombination={selectedCombination}
-                listPoomsaeLists={listPoomsaeLists}
+                listPoomsaeLists={listPoomsaeLists.filter(item => item.competitor.competition?.idPoomsaeCombination === selectedCombination?.idPoomsaeCombination)} // Filtered lists
             />
         </div>
     )

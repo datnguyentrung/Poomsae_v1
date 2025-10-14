@@ -11,7 +11,8 @@ export interface PoomsaeCombination {
     idPoomsaeCombination: string;
     poomsaeContent: PoomsaeContent;
     ageGroup: AgeGroup;
-    beltGroup: BeltGroup
+    beltGroup: BeltGroup;
+    isActive: boolean;
 }
 
 export interface PoomsaeList {

@@ -15,6 +15,8 @@ type Props = {
 }
 
 export default function PoomsaeList({ selectedCombination, listPoomsaeDTO }: Props) {
+    // console.log('selectedCombination:', selectedCombination);
+
     const [filteredList, setFilteredList] = React.useState<PoomsaeListType[]>([]);
     const handleEdit = (index: number) => {
         console.log('Edit athlete:', index);
@@ -39,7 +41,7 @@ export default function PoomsaeList({ selectedCombination, listPoomsaeDTO }: Pro
         createPoomsaeHistory(filteredList.map(item => item.idPoomsaeList));
     }
 
-    console.log('Filtered List:', filteredList.map(item => item.idPoomsaeList));
+    // console.log('Filtered List:', filteredList.map(item => item.idPoomsaeList));
 
     return (
         <div className='poomsae-list-container'>
@@ -59,6 +61,9 @@ export default function PoomsaeList({ selectedCombination, listPoomsaeDTO }: Pro
                             to={`/poomsae/sigma?${new URLSearchParams({
                                 combination: selectedCombination.idPoomsaeCombination,
                                 participants: filteredList.length.toString(),
+                                poomsaeContent: getDisplayName(PoomsaeContentMap, selectedCombination?.poomsaeContent.contentName || ''),
+                                beltGroup: getDisplayName(BeltGroupMap, selectedCombination?.beltGroup.beltGroupName || ''),
+                                ageGroup: getDisplayName(AgeGroupMap, selectedCombination?.ageGroup.ageGroupName || '')
                             })}`}
                         >
                             <button>Xem sơ đồ thi đấu</button>
@@ -68,14 +73,13 @@ export default function PoomsaeList({ selectedCombination, listPoomsaeDTO }: Pro
                             Xem sơ đồ thi đấu
                         </button>
                     )}
-
-                    <button onClick={handleCreatePoomsaeHistory}>Tạo sơ đồ thi đấu</button>
+                    {/* <button onClick={handleCreatePoomsaeHistory}>Tạo sơ đồ thi đấu</button> */}
                 </div>
                 <div className='table-content'>
                     <table>
                         <thead>
                             <tr>
-                                <th>Vị trí sơ đồ thi đấu</th>
+                                <th>Số thứ tự</th>
                                 <th>Sàn đấu</th>
                                 <th>Họ tên</th>
                                 <th>Cấp đai</th>
@@ -95,7 +99,7 @@ export default function PoomsaeList({ selectedCombination, listPoomsaeDTO }: Pro
                                     const student = item.competitor.personalAcademicInfo;
                                     return (
                                         <tr key={index}>
-                                            <td>Tứ kết - Trận {index + 1}</td>
+                                            <td>{index + 1}</td>
                                             <td>
                                                 <span className={`court-badge court-chung`}>
                                                     <span className='court-dot'></span>
