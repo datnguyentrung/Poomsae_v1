@@ -13,13 +13,16 @@ type Props = {
     targetNode?: number,
     participants?: number,
     onChooseWinner?: (player: PoomsaeHistory | SparringHistory) => void,
+    onDeleteNode?: (player: PoomsaeHistory | SparringHistory) => void,
     content?: string,
     onRefresh?: () => Promise<void>,
 }
 
-const Node = React.memo(function Node({ player, nodeStatus, targetNode, participants, onChooseWinner, content, onRefresh }: Props) {
+const Node = React.memo(function Node({ player, nodeStatus, targetNode, participants, onChooseWinner, onDeleteNode, content, onRefresh }: Props) {
     const [goalNode, setGoalNode] = React.useState<SigmaData | null>(null);
     const [useTextIndicator, setUseTextIndicator] = React.useState(false); // Toggle between icon and text
+
+    // console.log('PLayer in Node component:', player);
 
     // Kiểm tra xem có phải là content đôi nam nữ hoặc đồng đội nam nữ không
     const isTeamContent = content && (
@@ -55,16 +58,16 @@ const Node = React.memo(function Node({ player, nodeStatus, targetNode, particip
     }, [player, onChooseWinner, onRefresh]);
 
     const handleRemovePlayer = React.useCallback(async () => {
-        if (player) {
+        if (player && onDeleteNode) {
             console.log("Xóa player:", player.referenceInfo.name);
-            // TODO: Implement remove player confirmation
+            onDeleteNode(player);
 
             // Re-fetch data sau khi xóa
             if (onRefresh) {
                 await onRefresh();
             }
         }
-    }, [player, onRefresh]);
+    }, [player, onDeleteNode, onRefresh]);
 
     const handleAddPlayer = () => {
         console.log("Thêm player vào node");

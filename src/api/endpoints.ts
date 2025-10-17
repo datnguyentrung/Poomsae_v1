@@ -28,6 +28,7 @@ export const endpoints = {
         poomsaeCombination: (idPoomsaeCombination: string) => `${API_PREFIX}/poomsae-histories/combination/${idPoomsaeCombination}`,
         winner: `${API_PREFIX}/poomsae-histories/winner`,
         delete: `${API_PREFIX}/poomsae-histories`,  // DELETE with body and params
+        tournament: (idTournament: string) => `${API_PREFIX}/poomsae-histories/tournament/${idTournament}`,
     },
     poomsaeContent: {
         list: `${API_PREFIX}/poomsae-contents`,  // ✅ Thêm trailing slash
@@ -52,6 +53,7 @@ export const endpoints = {
         sparringCombination: (idSparringCombination: string) => `${API_PREFIX}/sparring-histories/combination/${idSparringCombination}`,
         winner: `${API_PREFIX}/sparring-histories/winner`,
         delete: `${API_PREFIX}/sparring-histories`,  // DELETE with body and params
+        tournament: (idTournament: string) => `${API_PREFIX}/sparring-histories/tournament/${idTournament}`,
     },
     sparringContent: {
         list: `${API_PREFIX}/sparring-contents`,  // ✅ Thêm trailing slash
@@ -89,5 +91,10 @@ export const endpoints = {
     },
     classSessions: {
         list: `${API_PREFIX}/class-sessions`,  // ✅ Thêm trailing slash
+    },
+    tournamentMatch: {
+        tournament: (idTournament: string) => `${API_PREFIX}/tournament-matches/tournament/${idTournament}`,
+        create: `${API_PREFIX}/tournament-matches`,
+        updateRelations: `${API_PREFIX}/tournament-matches/update-relations`,
     }
 };

@@ -65,3 +65,13 @@ export const deleteSparringHistory = async (idSparringHistory: string, participa
         throw error;
     }
 };
+
+export const getSparringHistoryByIdTournament = async (idTournament: string) => {
+    try {
+        const response = await axiosInstance.get(endpoints.sparringHistory.tournament(idTournament));
+        return response.data.data;
+    } catch (error) {
+        console.error("Error fetching Sparring history by tournament ID:", error);
+        throw error;
+    }
+};

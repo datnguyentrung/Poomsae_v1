@@ -26,3 +26,9 @@ export interface PoomsaeHistory {
     referenceInfo: ReferenceInfo;
     hasWon?: boolean;
 }
+
+export interface PoomsaeCategory {
+    ageGroupName: string;
+    beltGroupName: string;
+    contentName: string;
+}

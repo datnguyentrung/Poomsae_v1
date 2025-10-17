@@ -26,3 +26,9 @@ export interface SparringHistory {
     referenceInfo: ReferenceInfo;
     hasWon?: boolean;
 }
+
+export interface SparringCategory {
+    ageGroupName: string;
+    gender: string;
+    weightClass: number;
+}

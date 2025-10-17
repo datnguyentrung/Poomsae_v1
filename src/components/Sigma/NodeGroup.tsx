@@ -3,9 +3,17 @@ import Node from "./Node";
 import PlayerNode from "./PlayerNode";
 import type { PoomsaeHistory } from '@/types/Tournament/Poomsae';
 import type { SparringHistory } from '@/types/Tournament/Sparring';
-import { ArrowBigRight } from 'lucide-react';
+import type { ContextMenuItem } from '@/utils/ContextMenu';
+import type { TournamentMatchDTO } from '@/types/Tournament/TournamentMatch';
+
+import { ArrowBigRight, UserPlus } from 'lucide-react';
 import YesNoQuestion from './YesNoQuestion';
 import React from 'react';
+import { isPoomsaeHistory } from '@/utils/PoomsaeCheck';
+import ContextMenu from '@/utils/ContextMenu';
+
+import { createTournamentMatch } from '@/services/tournament/TournamentMatch';
+import { toast } from 'react-toastify';
 
 interface NodeGroupProps {
     player1?: PoomsaeHistory | SparringHistory;
@@ -73,15 +81,59 @@ const NodeGroup = React.memo(function NodeGroup({ player1, player2, numberMatch,
         setSelectedPlayer(null);
     }, []);
 
+
+    const handleAddMatch = () => {
+        const isPoomsae = isPoomsaeHistory(player1 ? player1 : player2 ? player2 : null);
+        const newMatch: TournamentMatchDTO = {
+            keyInfo: {
+                tournament: 'a8d5c830-c275-41b0-a251-294eb61c007f', // Thay thế bằng ID giải đấu thực tế
+                idCombination: isPoomsae
+                    ? (player1?.referenceInfo.poomsaeCombination ?? player2?.referenceInfo.poomsaeCombination ?? '')
+                    : (player1?.referenceInfo.sparringCombination ?? player2?.referenceInfo.sparringCombination ?? ''),
+                targetNode: targetNode !== undefined ? targetNode : 0,
+                participants: participants !== undefined ? participants : 0,
+            },
+            matchInfo: {
+                tournamentType: isPoomsae ? 'POOMSAE' : 'SPARRING',
+                startTime: null,
+            }
+        };
+        try {
+            createTournamentMatch(newMatch).then((createdMatch) => {
+                console.log("Match added to queue:", createdMatch);
+                toast.success('Đã thêm trận đấu vào danh sách chờ', { position: "top-right", autoClose: 3000, theme: "colored" });
+            }).catch((error) => {
+                console.error("Error adding match:", error);
+                toast.error('Lỗi khi thêm trận đấu vào danh sách chờ', { position: "top-right", autoClose: 3000, theme: "colored" });
+            });
+        } catch (error) {
+            console.error("Error adding match:", error);
+            toast.error('Lỗi khi thêm trận đấu vào danh sách chờ', { position: "top-right", autoClose: 3000, theme: "colored" });
+        }
+    }
+
+    const menuItems: ContextMenuItem[] = [
+        {
+            label: 'Thêm trận đấu',
+            onClick: handleAddMatch,
+            icon: <UserPlus size={16} />,
+            hint: 'Thêm trận đấu vào danh sách chờ'
+        },
+    ]
+
     /**
      * Renders the match number if applicable
      */
     const renderMatchNumber = () => {
-        if (targetNode !== undefined && targetNode !== 0 && numberMatch !== undefined) {
+        if (targetNode !== undefined) {
             return (
-                <div className="match-number">
-                    Trận {numberMatch}
-                </div>
+                <ContextMenu items={menuItems}>
+                    <div className="match-number" style={{ cursor: 'pointer' }}>
+                        {targetNode === -1 ? `Trận tranh Huy Chương Đồng`
+                            : targetNode === 0 ? `Trận tranh Huy Chương Vàng`
+                                : `Trận ${numberMatch}`}
+                    </div>
+                </ContextMenu>
             );
         }
         return null;
@@ -117,7 +169,7 @@ const NodeGroup = React.memo(function NodeGroup({ player1, player2, numberMatch,
     };
 
     return (
-        <div className={getNodeGroupClass()}>
+        <div className={getNodeGroupClass()} >
             {renderMatchNumber()}
 
             <div className='node-group'>

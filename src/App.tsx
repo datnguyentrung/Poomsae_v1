@@ -10,6 +10,7 @@ import PoomsaeLayout from './components/Poomsae/PoomsaeLayout/PoomsaeLayout';
 import SparringSigma from './components/Sparring/SparringSigma';
 import SparringLayout from './components/Sparring/SparringLayout/SparringLayout';
 import LoginForm from './components/Auth/LoginForm';
+import Match from './components/Match/Match';
 
 function App() {
   const location = useLocation();
@@ -23,7 +24,8 @@ function App() {
         location.pathname === '/sign-up-account'
       ) && <Navbar />}
       <Routes>
-        <Route path="/" element={<Navigate to="/home" />} />
+        <Route path="/" element={<Navigate to="/match" />} />
+        <Route path="/match" element={<Match />} />
 
         <Route path="/login" element={<LoginForm />} />
         <Route path="/sign-up-account" element={<div>Sign Up Page</div>} />

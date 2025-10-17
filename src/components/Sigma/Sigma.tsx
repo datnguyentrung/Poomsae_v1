@@ -16,20 +16,6 @@ type Props = {
     onRefresh?: () => Promise<void>,
 }
 
-// const data1 = {
-//     idPoomsaeHistory: "player-1",
-//     nodeInfo: { sourceNode: 5, targetNode: -1, levelNode: -1 },
-//     referenceInfo: { name: "Trần Thị B", poomsaeList: "taegeuk-2", poomsaeCombination: "combo-2" },
-//     hasWon: false
-// }
-
-// const data2 = {
-//     idPoomsaeHistory: "bronze-player-2",
-//     nodeInfo: { sourceNode: 14, targetNode: -1, levelNode: -1 },
-//     referenceInfo: { name: "Hoàng Thị F", poomsaeList: "taegeuk-6", poomsaeCombination: "combo-6" },
-//     hasWon: false
-// }
-
 export default function Sigma({ players, participants, content, onRefresh }: Props) {
     const [bracketNodes, setBracketNodes] = React.useState<BracketNode[]>([]);
     const [loading, setLoading] = React.useState(false);
@@ -51,7 +37,7 @@ export default function Sigma({ players, participants, content, onRefresh }: Pro
         return { level: [], totalRounds: 0, round: [] };
     }, [bracketNodes, participants, players?.length]);
 
-    console.log("Tournament Structure:", structure);
+    // console.log("Tournament Structure:", structure);
 
     /**
      * Creates Sigma data structure from bracket nodes

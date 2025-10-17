@@ -1,22 +1,5 @@
 import type { Node } from "../types/types";
 
-// export const getTournamentStructure = (playerCount: number) => {
-//     // if (playerCount % 2 !== 0 || playerCount < 2) {
-//     //     playerCount += 1; // Làm tròn lên số chẵn gần nhất
-//     // }
-
-//     const totalRounds = Math.ceil(Math.log2(playerCount));
-//     const firstRoundMatches = Math.floor(playerCount / 2);
-
-//     return {
-//         totalRounds,
-//         firstRoundMatches,
-//         matchesPerRound: Array.from({ length: totalRounds },
-//             (_, i) => Math.ceil(firstRoundMatches / Math.pow(2, i))
-//         )
-//     }
-// }
-
 export const getTotalPlayersNeeded = (playerCount: number) => {
     return Math.ceil(Math.log2(playerCount));
 }

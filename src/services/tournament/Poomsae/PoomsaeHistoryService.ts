@@ -84,3 +84,13 @@ export const deletePoomsaeHistoryByCombination = async (idPoomsaeCombination: st
         throw error;
     }
 };
+
+export const getPoomsaeHistoryByIdTournament = async (idTournament: string) => {
+    try {
+        const response = await axiosInstance.get(endpoints.poomsaeHistory.tournament(idTournament));
+        return response.data.data;
+    } catch (error) {
+        console.error("Error fetching poomsae history by tournament ID:", error);
+        throw error;
+    }
+};

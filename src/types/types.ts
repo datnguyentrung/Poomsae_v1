@@ -1,3 +1,6 @@
+import type { PoomsaeCategory } from "./Tournament/Poomsae";
+import type { SparringCategory } from "./Tournament/Sparring";
+
 export interface Player {
     id: number;
     name: string;
@@ -48,9 +51,11 @@ export interface ReferenceInfo {
 
     poomsaeList?: string;
     poomsaeCombination?: string;
+    poomsaeCategory?: PoomsaeCategory;
 
     sparringList?: string;
     sparringCombination?: string;
+    sparringCategory?: SparringCategory;
 }
 
 export interface SigmaData {
