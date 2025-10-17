@@ -23,6 +23,17 @@ export const createTournamentMatch = async (tournamentMatch: TournamentMatchDTO)
     }
 };
 
+export const deleteTournamentMatch = async (tournamentMatch: TournamentMatchDTO) => {
+    try {
+        const response = await axiosInstance.delete(endpoints.tournamentMatch.delete, { data: tournamentMatch.keyInfo });
+        toast.success("Xoá trận đấu thành công");
+        return response.data.data;
+    } catch (error) {
+        console.error("Error deleting tournament match:", error);
+        throw error;
+    }
+};
+
 export const updateMatchRelations = async (TournamentMatchDTO: TournamentMatchDTO) => {
     try {
         const response = await axiosInstance.put(endpoints.tournamentMatch.updateRelations, TournamentMatchDTO);
@@ -30,6 +41,18 @@ export const updateMatchRelations = async (TournamentMatchDTO: TournamentMatchDT
         return response.data.data;
     } catch (error) {
         console.error("Error updating match relations:", error);
+        throw error;
+    }
+};
+
+export const deleteMatchRelations = async (TournamentMatchDTO: TournamentMatchDTO) => {
+    console.log("Deleting match relations for:", TournamentMatchDTO);
+    try {
+        const response = await axiosInstance.delete(endpoints.tournamentMatch.deleteRelations, { data: TournamentMatchDTO.keyInfo });
+        toast.success("Xóa quan hệ trận đấu thành công");
+        return response.data.data;
+    } catch (error) {
+        console.error("Error deleting match relations:", error);
         throw error;
     }
 };

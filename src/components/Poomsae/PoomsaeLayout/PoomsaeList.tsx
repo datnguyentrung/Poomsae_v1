@@ -7,7 +7,7 @@ import type {
     PoomsaeList as PoomsaeListType,
     PoomsaeCombination as PoomsaeCombinationType
 } from '@/types/Tournament/Poomsae'
-import { createPoomsaeHistory } from "@/services/tournament/Poomsae/PoomsaeHistoryService";
+import { createPoomsaeHistoryForNode, createPoomsaeHistoryForRoundRobin } from "@/services/tournament/Poomsae/PoomsaeHistoryService";
 
 type Props = {
     selectedCombination: PoomsaeCombinationType | null;
@@ -37,8 +37,12 @@ export default function PoomsaeList({ selectedCombination, listPoomsaeDTO }: Pro
         }
     }, [listPoomsaeDTO, selectedCombination]);
 
-    const handleCreatePoomsaeHistory = () => {
-        createPoomsaeHistory(filteredList.map(item => item.idPoomsaeList));
+    const handleCreatePoomsaeHistoryForNode = () => {
+        createPoomsaeHistoryForNode(filteredList.map(item => item.idPoomsaeList));
+    }
+
+    const handleCreatePoomsaeHistoryForRoundRobin = () => {
+        createPoomsaeHistoryForRoundRobin(filteredList.map(item => item.idPoomsaeList));
     }
 
     // console.log('Filtered List:', filteredList.map(item => item.idPoomsaeList));
@@ -73,7 +77,8 @@ export default function PoomsaeList({ selectedCombination, listPoomsaeDTO }: Pro
                             Xem sơ đồ thi đấu
                         </button>
                     )}
-                    {/* <button onClick={handleCreatePoomsaeHistory}>Tạo sơ đồ thi đấu</button> */}
+                    {/* <button onClick={handleCreatePoomsaeHistoryForNode}>Tạo sơ đồ thi đấu trực tiếp</button> */}
+                    {/* <button onClick={handleCreatePoomsaeHistoryForRoundRobin}>Tạo sơ đồ thi đấu vòng tròn</button> */}
                 </div>
                 <div className='table-content'>
                     <table>

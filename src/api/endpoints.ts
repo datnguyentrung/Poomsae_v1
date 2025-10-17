@@ -24,7 +24,8 @@ export const endpoints = {
     },
     poomsaeHistory: {
         list: `${API_PREFIX}/poomsae-histories`,  // ✅ Thêm trailing slash
-        create: `${API_PREFIX}/poomsae-histories`,
+        createForNode: `${API_PREFIX}/poomsae-histories/node`,
+        createForRoundRobin: `${API_PREFIX}/poomsae-histories/round-robin`,
         poomsaeCombination: (idPoomsaeCombination: string) => `${API_PREFIX}/poomsae-histories/combination/${idPoomsaeCombination}`,
         winner: `${API_PREFIX}/poomsae-histories/winner`,
         delete: `${API_PREFIX}/poomsae-histories`,  // DELETE with body and params
@@ -95,6 +96,8 @@ export const endpoints = {
     tournamentMatch: {
         tournament: (idTournament: string) => `${API_PREFIX}/tournament-matches/tournament/${idTournament}`,
         create: `${API_PREFIX}/tournament-matches`,
+        delete: `${API_PREFIX}/tournament-matches`,
         updateRelations: `${API_PREFIX}/tournament-matches/update-relations`,
+        deleteRelations: `${API_PREFIX}/tournament-matches/delete-relations`,
     }
 };

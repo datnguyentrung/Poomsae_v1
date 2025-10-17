@@ -14,14 +14,27 @@ export const getAllPoomsaeHistories = async () => {
     }
 };
 
-export const createPoomsaeHistory = async (idPoomsaeList: string[]) => {
+export const createPoomsaeHistoryForNode = async (idPoomsaeList: string[]) => {
     try {
-        const response = await axiosInstance.post(endpoints.poomsaeHistory.create, idPoomsaeList);
+        const response = await axiosInstance.post(endpoints.poomsaeHistory.createForNode, idPoomsaeList);
         console.log('Created poomsae history:', response.data.data);
         toast.success("Thêm danh sách vận động viên thành công!");
         return response.data.data;
     } catch (error) {
         console.error("Error creating poomsae history:", error);
+        toast.error("Thêm danh sách vận động viên thất bại!");
+        throw error;
+    }
+};
+
+export const createPoomsaeHistoryForRoundRobin = async (idPoomsaeList: string[]) => {
+    try {
+        const response = await axiosInstance.post(endpoints.poomsaeHistory.createForRoundRobin, idPoomsaeList);
+        console.log('Created poomsae history for round robin:', response.data.data);
+        toast.success("Thêm danh sách vận động viên thành công!");
+        return response.data.data;
+    } catch (error) {
+        console.error("Error creating poomsae history for round robin:", error);
         toast.error("Thêm danh sách vận động viên thất bại!");
         throw error;
     }
