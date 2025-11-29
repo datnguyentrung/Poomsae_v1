@@ -14,9 +14,9 @@ export const getAllPoomsaeHistories = async () => {
     }
 };
 
-export const createPoomsaeHistoryForNode = async (idPoomsaeList: string[]) => {
+export const createPoomsaeHistoryForElimination = async (idPoomsaeList: string[]) => {
     try {
-        const response = await axiosInstance.post(endpoints.poomsaeHistory.createForNode, idPoomsaeList);
+        const response = await axiosInstance.post(endpoints.poomsaeHistory.createForElimination, idPoomsaeList);
         console.log('Created poomsae history:', response.data.data);
         toast.success("Thêm danh sách vận động viên thành công!");
         return response.data.data;
@@ -51,25 +51,39 @@ export const getPoomsaeHistoriesByCombination = async (idPoomsaeCombination: str
     }
 };
 
-export const createPoomsaeWinner = async (participants: number, poomsaeHistoryDTO: PoomsaeHistory) => {
+export const createPoomsaeEliminationWinner = async (participants: number, poomsaeHistoryDTO: PoomsaeHistory) => {
     try {
         const response = await axiosInstance.post(
-            endpoints.poomsaeHistory.winner,
+            endpoints.poomsaeHistory.eliminationWinner,
             poomsaeHistoryDTO,
             { params: { participants } }
         );
         console.log('Created poomsae winner:', response.data);
         return response.data.data;
     } catch (error) {
-        console.error("Error creating poomsae winner:", error);
+        console.error("Error creating poomsae elimination winner:", error);
         throw error;
     }
 };
 
-export const deletePoomsaeHistory = async (idPoomsaeHistory: string, participants: number) => {
+export const createPoomsaeRoundRobinWinner = async (poomsaeHistoryDTO: PoomsaeHistory) => {
+    try {
+        const response = await axiosInstance.post(
+            endpoints.poomsaeHistory.roundRobinWinner,
+            poomsaeHistoryDTO
+        );
+        console.log('Created poomsae round robin winner:', response.data);
+        return response.data.data;
+    } catch (error) {
+        console.error("Error creating poomsae round robin winner:", error);
+        throw error;
+    }
+};
+
+export const deletePoomsaeHistoryForElimination = async (idPoomsaeHistory: string, participants: number) => {
     try {
         const response = await axiosInstance.delete(
-            endpoints.poomsaeHistory.delete,
+            endpoints.poomsaeHistory.eliminationDelete,
             {
                 params: { idPoomsaeHistory, participants } // ✅ dùng params, không dùng data
             }
@@ -82,10 +96,26 @@ export const deletePoomsaeHistory = async (idPoomsaeHistory: string, participant
     }
 };
 
+export const deletePoomsaeHistoryForRoundRobin = async (idPoomsaeHistory: string) => {
+    try {
+        const response = await axiosInstance.delete(
+            endpoints.poomsaeHistory.roundRobinDelete,
+            {
+                params: { idPoomsaeHistory } // ✅ dùng params, không dùng data
+            }
+        );
+        console.log('Deleted poomsae history for round robin:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting poomsae history for round robin:", error);
+        throw error;
+    }
+};
+
 export const deletePoomsaeHistoryByCombination = async (idPoomsaeCombination: string) => {
     try {
         const response = await axiosInstance.delete(
-            endpoints.poomsaeHistory.delete,
+            endpoints.poomsaeHistory.eliminationDelete,
             {
                 params: { idPoomsaeCombination } // ✅ dùng params, không dùng data
             }

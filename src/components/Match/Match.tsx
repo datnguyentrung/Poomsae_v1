@@ -14,9 +14,9 @@ import type { SparringHistory } from '@/types/Tournament/Sparring';
 
 import { PoomsaeSigmaLocalStorage } from '@/utils/PoomsaeSigmaStorage';
 import { AgeGroupMap, BeltGroupMap, getDisplayName, PoomsaeContentMap, GenderMap } from '@/constants/TournamentConstants';
-import Node from '@/components/Sigma/Node';
+import Node from '@/components/SigmaElimination/Node';
 import ContextMenu from '@/utils/ContextMenu';
-import YesNoQuestion from '../Sigma/YesNoQuestion';
+import YesNoQuestion from '../SigmaElimination/YesNoQuestion';
 
 import { toast } from 'react-toastify';
 
@@ -250,8 +250,8 @@ export default function Match() {
     // Lọc các match để hiển thị (có relation hoặc là firstNode)
     const displayMatches = useMemo(() => {
         return orderedMatches.filter(match =>
-            match.relationInfo.leftMatch !== null
-            || match.relationInfo.rightMatch !== null
+            match.relationInfo!.leftMatch !== null
+            || match.relationInfo!.rightMatch !== null
             || match.keyInfo.firstNode
         );
     }, [orderedMatches]);
@@ -259,8 +259,8 @@ export default function Match() {
     // Lọc các match pending (không có relation và không phải firstNode)
     const pendingMatches = useMemo(() => {
         return tournamentMatches.filter(match =>
-            match.relationInfo.leftMatch === null
-            && match.relationInfo.rightMatch === null
+            match.relationInfo!.leftMatch === null
+            && match.relationInfo!.rightMatch === null
             && !match.keyInfo.firstNode
         );
     }, [tournamentMatches]);
@@ -327,8 +327,8 @@ export default function Match() {
                 const leftMatch = i > 0 ? tempOrderedMatches[i - 1] : null;
                 const rightMatch = i < tempOrderedMatches.length - 1 ? tempOrderedMatches[i + 1] : null;
 
-                currentMatch.relationInfo.leftMatch = leftMatch?.keyInfo || null;
-                currentMatch.relationInfo.rightMatch = rightMatch?.keyInfo || null;
+                currentMatch!.relationInfo!.leftMatch = leftMatch?.keyInfo || null;
+                currentMatch!.relationInfo!.rightMatch = rightMatch?.keyInfo || null;
 
                 await updateMatchRelations(currentMatch);
             }
@@ -436,12 +436,12 @@ export default function Match() {
                     selectedMatchForAdd.relationInfo.leftMatch = insertAfterMatch.keyInfo;
 
                     // 2. Set rightMatch của new match = insertAfterMatch.relationInfo.rightMatch
-                    selectedMatchForAdd.relationInfo.rightMatch = insertAfterMatch.relationInfo.rightMatch;
+                    selectedMatchForAdd.relationInfo.rightMatch = insertAfterMatch.relationInfo!.rightMatch;
 
                     // 3. Update insertAfterMatch.relationInfo.rightMatch = newMatch.keyInfo
-                    insertAfterMatch.relationInfo.rightMatch = selectedMatchForAdd.keyInfo;
+                    insertAfterMatch!.relationInfo!.rightMatch = selectedMatchForAdd!.keyInfo;
 
-                    selectedMatchForAdd.matchInfo.session = selectedSessionForAdd;
+                    selectedMatchForAdd!.matchInfo!.session = selectedSessionForAdd;
 
                     // Update both matches
                     await Promise.all([
@@ -452,13 +452,13 @@ export default function Match() {
                     // 4. Nếu có match tiếp theo, update leftMatch của nó = newMatch.keyInfo
                     if (selectedMatchForAdd.relationInfo.rightMatch) {
                         const nextMatch = displayMatches.find(m =>
-                            m.keyInfo.tournament === selectedMatchForAdd.relationInfo.rightMatch?.tournament &&
-                            m.keyInfo.idCombination === selectedMatchForAdd.relationInfo.rightMatch?.idCombination &&
-                            m.keyInfo.targetNode === selectedMatchForAdd.relationInfo.rightMatch?.targetNode
+                            m.keyInfo.tournament === selectedMatchForAdd!.relationInfo!.rightMatch?.tournament &&
+                            m.keyInfo.idCombination === selectedMatchForAdd!.relationInfo!.rightMatch?.idCombination &&
+                            m.keyInfo.targetNode === selectedMatchForAdd!.relationInfo!.rightMatch?.targetNode
                         );
 
                         if (nextMatch && nextMatch.relationInfo) {
-                            nextMatch.relationInfo.leftMatch = selectedMatchForAdd.keyInfo;
+                            nextMatch.relationInfo.leftMatch = selectedMatchForAdd!.keyInfo;
                             await updateMatchRelations(nextMatch);
                         }
                     }
@@ -602,8 +602,13 @@ export default function Match() {
                         let player1: PoomsaeHistory | SparringHistory | undefined;
                         let player2: PoomsaeHistory | SparringHistory | undefined;
                         let contentName = '';
-
-                        if (match.matchInfo.tournamentType === 'POOMSAE') {
+                        const checked: boolean = match.matchInfo?.categoryName?.contentName === 'PAIR' || match.matchInfo?.categoryName?.contentName === 'MIXED_TEAM'
+                            || match.matchInfo?.categoryName?.contentName === 'MALE_TEAM' || match.matchInfo?.categoryName?.contentName === 'FEMALE_TEAM';
+                        if (checked) {
+                            contentName = `${getDisplayName(PoomsaeContentMap, match.matchInfo?.categoryName?.contentName || '')} - 
+                                ${getDisplayName(BeltGroupMap, match.matchInfo?.categoryName?.beltGroupName || '')} - 
+                                ${getDisplayName(AgeGroupMap, match.matchInfo?.categoryName?.ageGroupName || '')}`;
+                        } else if (match.matchInfo.tournamentType === 'POOMSAE') {
                             const players = poomsaeMap
                                 .get(idCombination)
                                 ?.filter(p => p.nodeInfo.targetNode === targetNode)
@@ -648,30 +653,37 @@ export default function Match() {
                                     </ContextMenu>
                                 </div>
 
-                                <div className="player1-container">
-                                    <Node
-                                        player={player1}
-                                        nodeStatus='chung'
-                                        targetNode={targetNode}
-                                        participants={match.keyInfo.participants}
-                                        onChooseWinner={handleChooseWinner}
-                                        onDeleteNode={handleDeleteNode}
-                                        content={player1?.referenceInfo.poomsaeCategory?.contentName || ''}
-                                    />
+                                {player1 && player2 && (
+                                    <>
+                                        <div className="player1-container">
+                                            <Node
+                                                player={player1}
+                                                nodeStatus='chung'
+                                                targetNode={targetNode}
+                                                participants={match.keyInfo.participants}
+                                                onChooseWinner={handleChooseWinner}
+                                                onDeleteNode={handleDeleteNode}
+                                                content={player1?.referenceInfo.poomsaeCategory?.contentName || ''}
+                                            />
+                                        </div>
+                                        <div className="vs-divider">VS</div>
+                                        <div className="player2-container">
+                                            <Node
+                                                player={player2}
+                                                nodeStatus='hong'
+                                                targetNode={targetNode}
+                                                participants={match.keyInfo.participants}
+                                                onChooseWinner={handleChooseWinner}
+                                                onDeleteNode={handleDeleteNode}
+                                                content={player2?.referenceInfo.poomsaeCategory?.contentName || ''}
+                                            />
+                                        </div>
+                                    </>
+                                )}
+                                <div className="round-info">
+                                    {checked ? 'Chung kết'
+                                        : parentNodeData?.round ? parentNodeData.round : 'Tranh đồng'}
                                 </div>
-                                <div className="vs-divider">VS</div>
-                                <div className="player2-container">
-                                    <Node
-                                        player={player2}
-                                        nodeStatus='hong'
-                                        targetNode={targetNode}
-                                        participants={match.keyInfo.participants}
-                                        onChooseWinner={handleChooseWinner}
-                                        onDeleteNode={handleDeleteNode}
-                                        content={player2?.referenceInfo.poomsaeCategory?.contentName || ''}
-                                    />
-                                </div>
-                                <div className="round-info">{parentNodeData?.round ? parentNodeData.round : 'Tranh đồng'}</div>
                                 <div className='time'>
                                     {(() => {
                                         const matchKey = `${match.keyInfo.tournament}-${match.keyInfo.idCombination}-${match.keyInfo.targetNode}`;
@@ -738,33 +750,35 @@ export default function Match() {
             />
 
             {/* Reorder Confirmation Modal */}
-            {showReorderConfirm && (
-                <div className="modal-overlay" onClick={handleCancelReorder}>
-                    <div className="reorder-modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3>Xác nhận thay đổi thứ tự</h3>
-                        </div>
-                        <div className="modal-content">
-                            <p>Bạn có muốn lưu thay đổi thứ tự trận đấu không?</p>
-                            <p className="modal-warning">Thao tác này sẽ cập nhật quan hệ liên kết giữa các trận đấu.</p>
-                        </div>
-                        <div className="modal-actions">
-                            <button
-                                className="btn-cancel"
-                                onClick={handleCancelReorder}
-                            >
-                                Hủy
-                            </button>
-                            <button
-                                className="btn-confirm"
-                                onClick={handleConfirmReorder}
-                            >
-                                Lưu thay đổi
-                            </button>
+            {
+                showReorderConfirm && (
+                    <div className="modal-overlay" onClick={handleCancelReorder}>
+                        <div className="reorder-modal" onClick={(e) => e.stopPropagation()}>
+                            <div className="modal-header">
+                                <h3>Xác nhận thay đổi thứ tự</h3>
+                            </div>
+                            <div className="modal-content">
+                                <p>Bạn có muốn lưu thay đổi thứ tự trận đấu không?</p>
+                                <p className="modal-warning">Thao tác này sẽ cập nhật quan hệ liên kết giữa các trận đấu.</p>
+                            </div>
+                            <div className="modal-actions">
+                                <button
+                                    className="btn-cancel"
+                                    onClick={handleCancelReorder}
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    className="btn-confirm"
+                                    onClick={handleConfirmReorder}
+                                >
+                                    Lưu thay đổi
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     )
 }

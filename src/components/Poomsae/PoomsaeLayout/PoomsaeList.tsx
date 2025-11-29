@@ -7,7 +7,7 @@ import type {
     PoomsaeList as PoomsaeListType,
     PoomsaeCombination as PoomsaeCombinationType
 } from '@/types/Tournament/Poomsae'
-import { createPoomsaeHistoryForNode, createPoomsaeHistoryForRoundRobin } from "@/services/tournament/Poomsae/PoomsaeHistoryService";
+import { createPoomsaeHistoryForElimination, createPoomsaeHistoryForRoundRobin } from "@/services/tournament/Poomsae/PoomsaeHistoryService";
 
 type Props = {
     selectedCombination: PoomsaeCombinationType | null;
@@ -37,8 +37,8 @@ export default function PoomsaeList({ selectedCombination, listPoomsaeDTO }: Pro
         }
     }, [listPoomsaeDTO, selectedCombination]);
 
-    const handleCreatePoomsaeHistoryForNode = () => {
-        createPoomsaeHistoryForNode(filteredList.map(item => item.idPoomsaeList));
+    const handleCreatePoomsaeHistoryForElimination = () => {
+        createPoomsaeHistoryForElimination(filteredList.map(item => item.idPoomsaeList));
     }
 
     const handleCreatePoomsaeHistoryForRoundRobin = () => {
@@ -65,6 +65,7 @@ export default function PoomsaeList({ selectedCombination, listPoomsaeDTO }: Pro
                             to={`/poomsae/sigma?${new URLSearchParams({
                                 combination: selectedCombination.idPoomsaeCombination,
                                 participants: filteredList.length.toString(),
+                                mode: selectedCombination.poomsaeMode,
                                 poomsaeContent: getDisplayName(PoomsaeContentMap, selectedCombination?.poomsaeContent.contentName || ''),
                                 beltGroup: getDisplayName(BeltGroupMap, selectedCombination?.beltGroup.beltGroupName || ''),
                                 ageGroup: getDisplayName(AgeGroupMap, selectedCombination?.ageGroup.ageGroupName || '')
@@ -77,8 +78,15 @@ export default function PoomsaeList({ selectedCombination, listPoomsaeDTO }: Pro
                             Xem sơ đồ thi đấu
                         </button>
                     )}
-                    {/* <button onClick={handleCreatePoomsaeHistoryForNode}>Tạo sơ đồ thi đấu trực tiếp</button> */}
-                    {/* <button onClick={handleCreatePoomsaeHistoryForRoundRobin}>Tạo sơ đồ thi đấu vòng tròn</button> */}
+
+                    {selectedCombination?.poomsaeMode === 'ELIMINATION'
+                        ? <button onClick={handleCreatePoomsaeHistoryForElimination}>
+                            Tạo sơ đồ thi đấu loại trực tiếp
+                        </button>
+                        : <button onClick={handleCreatePoomsaeHistoryForRoundRobin}>
+                            Tạo sơ đồ thi đấu vòng tròn
+                        </button>
+                    }
                 </div>
                 <div className='table-content'>
                     <table>

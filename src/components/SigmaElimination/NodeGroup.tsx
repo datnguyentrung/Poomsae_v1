@@ -95,7 +95,6 @@ const NodeGroup = React.memo(function NodeGroup({ player1, player2, numberMatch,
             },
             matchInfo: {
                 tournamentType: isPoomsae ? 'POOMSAE' : 'SPARRING',
-                startTime: null,
             }
         };
         try {

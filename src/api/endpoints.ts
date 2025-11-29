@@ -24,11 +24,13 @@ export const endpoints = {
     },
     poomsaeHistory: {
         list: `${API_PREFIX}/poomsae-histories`,  // ✅ Thêm trailing slash
-        createForNode: `${API_PREFIX}/poomsae-histories/node`,
+        createForElimination: `${API_PREFIX}/poomsae-histories/elimination`,
         createForRoundRobin: `${API_PREFIX}/poomsae-histories/round-robin`,
         poomsaeCombination: (idPoomsaeCombination: string) => `${API_PREFIX}/poomsae-histories/combination/${idPoomsaeCombination}`,
-        winner: `${API_PREFIX}/poomsae-histories/winner`,
-        delete: `${API_PREFIX}/poomsae-histories`,  // DELETE with body and params
+        eliminationWinner: `${API_PREFIX}/poomsae-histories/elimination/winner`,
+        roundRobinWinner: `${API_PREFIX}/poomsae-histories/round-robin/winner`,
+        eliminationDelete: `${API_PREFIX}/poomsae-histories/elimination`,  // DELETE with body and params
+        roundRobinDelete: `${API_PREFIX}/poomsae-histories/round-robin`,  // DELETE with body and params
         tournament: (idTournament: string) => `${API_PREFIX}/poomsae-histories/tournament/${idTournament}`,
     },
     poomsaeContent: {

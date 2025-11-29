@@ -33,6 +33,7 @@ function App() {
         <Route path='/poomsae/layout' element={<PoomsaeLayout />} />
         <Route path="/poomsae/sigma" element={<PoomsaeSigma />} />
 
+
         <Route path='/sparring/layout' element={<SparringLayout />} />
         <Route path="/sparring/sigma" element={<SparringSigma />} />
         <Route path="*" element={<div>404 Not Found</div>} />

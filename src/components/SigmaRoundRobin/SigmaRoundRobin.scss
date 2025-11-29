@@ -1,0 +1,8 @@
+.sigma-round-robin {
+    // Simply wrap the RoundRobinManager
+    background: #f8f9fa;
+    min-height: 100vh;
+
+    // Remove any padding since RoundRobinManager has its own
+    padding: 0;
+}

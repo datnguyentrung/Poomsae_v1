@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { SparringHistory } from '@/types/Tournament/Sparring';
-import Sigma from '../Sigma/Sigma';
+import Sigma from '../SigmaElimination/SigmaElimination';
 import { getAllSparringHistories } from '@/services/tournament/Sparring/SparringHistoryService';
 import './SparringSigma.scss';
 // Dữ liệu ban đầu - có thể thay đổi số lượng players
@@ -63,11 +63,11 @@ export default function SparringSigma() {
                     <h2 className="sparring-sigma__title">
                         Sơ đồ thi đấu Đối kháng
                     </h2>
-                    
+
                     <div className="sparring-sigma__combination">
                         {ageGroup} - {weightClass}
                     </div>
-                    
+
                     <div className="sparring-sigma__info">
                         <div className="sparring-sigma__info-item">
                             <div className="sparring-sigma__info-icon">
@@ -78,7 +78,7 @@ export default function SparringSigma() {
                                 <div className="value">{ageGroup}</div>
                             </div>
                         </div>
-                        
+
                         <div className="sparring-sigma__info-item">
                             <div className="sparring-sigma__info-icon">
                                 ⚖️
@@ -88,7 +88,7 @@ export default function SparringSigma() {
                                 <div className="value">{weightClass}</div>
                             </div>
                         </div>
-                        
+
                         <div className="sparring-sigma__info-item">
                             <div className="sparring-sigma__info-icon">
                                 👥
@@ -101,7 +101,7 @@ export default function SparringSigma() {
                     </div>
                 </div>
             )}
-            
+
             <div className="sparring-sigma__sigma-container">
                 {filteredHistories.length > 0 ? (
                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */

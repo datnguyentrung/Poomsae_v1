@@ -40,26 +40,39 @@ export default function MatchPending({
                         let player2: PoomsaeHistory | SparringHistory | undefined;
                         let contentName = '';
 
-                        if (match.matchInfo.tournamentType === 'POOMSAE') {
+                        if (match.matchInfo?.categoryName?.contentName === 'PAIR' || match.matchInfo?.categoryName?.contentName === 'MIXED_TEAM'
+                            || match.matchInfo?.categoryName?.contentName === 'MALE_TEAM' || match.matchInfo?.categoryName?.contentName === 'FEMALE_TEAM'
+                        ) {
+                            contentName = `${getDisplayName(PoomsaeContentMap, match.matchInfo?.categoryName?.contentName || '')} - 
+                                                        ${getDisplayName(BeltGroupMap, match.matchInfo?.categoryName?.beltGroupName || '')} - 
+                                                        ${getDisplayName(AgeGroupMap, match.matchInfo?.categoryName?.ageGroupName || '')}`;
+                        } else if (match.matchInfo.tournamentType === 'POOMSAE') {
                             const players = poomsaeMap
                                 .get(idCombination)
                                 ?.filter(p => p.nodeInfo.targetNode === targetNode)
                                 .sort((a, b) => (a.nodeInfo.sourceNode || 0) - (b.nodeInfo.sourceNode || 0)) ?? [];
-                            [player1, player2] = players;
 
-                            const category = player1?.referenceInfo.poomsaeCategory || player2?.referenceInfo.poomsaeCategory;
+                            // console.log(JSON.stringify(players, null, 2));
+
+                            [player1, player2] = players; // destructuring an array safely
+
+                            const category =
+                                player1?.referenceInfo.poomsaeCategory || player2?.referenceInfo.poomsaeCategory;
+
                             contentName = `${getDisplayName(PoomsaeContentMap, category?.contentName || '')} - 
-                            ${getDisplayName(BeltGroupMap, category?.beltGroupName || '')} - 
-                            ${getDisplayName(AgeGroupMap, category?.ageGroupName || '')}`;
-
+                                                        ${getDisplayName(BeltGroupMap, category?.beltGroupName || '')} - 
+                                                        ${getDisplayName(AgeGroupMap, category?.ageGroupName || '')}`;
                         } else if (match.matchInfo.tournamentType === 'SPARRING') {
-                            const players = sparringMap.get(idCombination) || [];
+                            const players = sparringMap
+                                .get(idCombination)
+                                ?.filter(s => s.nodeInfo.targetNode === targetNode)
+                                .sort((a, b) => (a.nodeInfo.sourceNode || 0) - (b.nodeInfo.sourceNode || 0)) ?? [];
                             [player1, player2] = players;
 
                             const category = player1?.referenceInfo.sparringCategory || player2?.referenceInfo.sparringCategory;
                             contentName = `${getDisplayName(GenderMap, category?.gender || '')} - 
-                            ${getDisplayName(AgeGroupMap, category?.ageGroupName || '')} -
-                            ${category?.weightClass || ''}`;
+                                                    ${getDisplayName(AgeGroupMap, category?.ageGroupName || '')} -
+                                                    ${category?.weightClass || ''}`;
                         }
 
                         return (

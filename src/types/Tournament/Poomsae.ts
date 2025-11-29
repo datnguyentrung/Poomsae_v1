@@ -13,6 +13,7 @@ export interface PoomsaeCombination {
     ageGroup: AgeGroup;
     beltGroup: BeltGroup;
     isActive: boolean;
+    poomsaeMode: 'ROUND_ROBIN' | 'ELIMINATION';
 }
 
 export interface PoomsaeList {

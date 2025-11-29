@@ -2,7 +2,7 @@ import './YesNoQuestion.scss'
 import React from 'react';
 import type { PoomsaeHistory } from '@/types/Tournament/Poomsae';
 import type { SparringHistory } from '@/types/Tournament/Sparring';
-import { createPoomsaeWinner, deletePoomsaeHistory } from '@/services/tournament/Poomsae/PoomsaeHistoryService';
+import { createPoomsaeEliminationWinner, deletePoomsaeHistoryForElimination } from '@/services/tournament/Poomsae/PoomsaeHistoryService';
 import { createPortal } from 'react-dom';
 import { createSparringWinner, deleteSparringHistory } from '@/services/tournament/Sparring/SparringHistoryService';
 
@@ -45,10 +45,10 @@ export default function YesNoQuestion({ isOpen, mode, player, participants, onCo
             if ('idPoomsaeHistory' in player) {
                 // player là PoomsaeHistory
                 if (mode === 'winner') {
-                    await createPoomsaeWinner(participants || 0, player);
+                    await createPoomsaeEliminationWinner(participants || 0, player);
                     console.log('Poomsae winner confirmed:', player.referenceInfo?.name);
                 } else if (mode === 'delete') {
-                    await deletePoomsaeHistory(player.idPoomsaeHistory, participants || 0);
+                    await deletePoomsaeHistoryForElimination(player.idPoomsaeHistory, participants || 0);
                     console.log('Poomsae node deletion confirmed for:', player.referenceInfo?.name);
                 }
             }

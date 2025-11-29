@@ -1,4 +1,4 @@
-import './Sigma.scss';
+import './SigmaElimination.scss';
 import NodeGroup from "./NodeGroup";
 import { getTournamentStructure, getTotalPlayersNeeded, getLabelForMatch } from "../../utils/NodeUtils";
 import type { Node as BracketNode } from '@/types/types';
@@ -16,7 +16,7 @@ type Props = {
     onRefresh?: () => Promise<void>,
 }
 
-export default function Sigma({ players, participants, content, onRefresh }: Props) {
+export default function SigmaElimination({ players, participants, content, onRefresh }: Props) {
     const [bracketNodes, setBracketNodes] = React.useState<BracketNode[]>([]);
     const [loading, setLoading] = React.useState(false);
     const [cachedParticipants, setCachedParticipants] = React.useState<number | null>(null);

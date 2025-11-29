@@ -29,8 +29,8 @@ export default function AddMatchModal({
 
     // Lọc các match đã có relation
     const displayedMatches = tournamentMatches.filter(match =>
-        match.relationInfo.leftMatch !== null
-        || match.relationInfo.rightMatch !== null
+        match?.relationInfo?.leftMatch !== null
+        || match?.relationInfo?.rightMatch !== null
         || match.keyInfo.firstNode
     );
 
